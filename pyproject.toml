@@ -19,6 +19,9 @@ passlib = "^1.7.4"
 mysql-connector-python = "^8.3.0"
 
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
