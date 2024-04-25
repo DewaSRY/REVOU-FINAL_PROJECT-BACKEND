@@ -47,12 +47,11 @@ class ImageService:
     def is_filename_safe(cls, file: Union[str, FileStorage]) -> bool:
         """
         Check if a filename is secure according to our definition
-        - starts with a-z A-Z 0-9 at least one time
-        - only contains a-z A-Z 0-9 and _().-
-        - followed by a dot (.) and a allowed_format at the end
+            - starts with a-z A-Z 0-9 at least one time
+            - only contains a-z A-Z 0-9 and _().-
+            - followed by a dot (.) and a allowed_format at the end
         """
         filename =cls._retrieve_filename(file)
-
         allowed_format = "|".join(IMAGES)
         # format IMAGES into regex, eg: ('jpeg','png') --> 'jpeg|png'
         regex = f"^[a-zA-Z0-9][a-zA-Z0-9_()-\.]*\.({allowed_format})$"

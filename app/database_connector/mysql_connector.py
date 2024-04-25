@@ -3,7 +3,7 @@ from os import environ
 
 
 
-def get_mysql_connector():
+def getMysqlConnector():
     """my sql connector"""
     USER_NAME=environ.get('USER_NAME') 
     PASSWORD=environ.get('PASSWORD')

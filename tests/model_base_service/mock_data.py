@@ -1,12 +1,10 @@
+from dataclasses import dataclass, field
 
 
-
-from dataclasses import dataclass,field
-
-@dataclass 
+@dataclass
 class MockData:
-    id:int= field(init=False)
-    name:str
-    
+    id: int = field(init=False)
+    name: str
+
     def halloo():
         print("hallo")

@@ -1,3 +1,3 @@
 
-from .sqlite_connector import get_sqlite_connector
-from .mysql_connector import get_mysql_connector
+from .sqlite_connector import getSqliteConnector
+from .mysql_connector import getMysqlConnector
