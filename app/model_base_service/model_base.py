@@ -1,5 +1,6 @@
 
-from .sql_model_instance import SQLModelInstance
+from typing import Union
+from .db import Base
 
 class ModelBase: 
     """ModelBase
@@ -16,3 +17,5 @@ class ModelBase:
     def _delete(self):
       raise Exception(f"{self.__class__} _delete not implement, need to implement this method to receive the service")
     
+    def _get_model_by_id(self, model_id: Union[str, int])-> Union[Base, None]:
+      raise Exception(f"{self.__class__} not implement _get_model_by_id")
