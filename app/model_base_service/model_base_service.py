@@ -17,6 +17,12 @@ class ModelBaseService[T](ModelBase):
 
     session: Session = db.session
 
+    def _delete(self):
+        """_delete
+        it s will be default method
+        """
+        self.session.delete(self)
+
     @classmethod
     def set_session(cls, session: Session) -> None:
         """set_session
@@ -85,6 +91,7 @@ class ModelBaseService[T](ModelBase):
         """
         model: T = cls._get_model_by_id(cls, model_id=model_id)
         cls.update_model(model=model, **args)
+        return model
 
     @classmethod
     def delete_model_with_id(cls, model_id: Union[str, int]):

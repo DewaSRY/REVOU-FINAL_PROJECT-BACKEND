@@ -5,12 +5,12 @@ Returns:
 
 from sqlalchemy.sql import func
 from datetime import datetime
-from passlib.hash import pbkdf2_sha256
-from sqlalchemy import String, DateTime
+from sqlalchemy import String, DateTime, Integer, ForeignKey
 from sqlalchemy.orm import (
     mapped_column,
 )
 from app.model_base_service import db, ModelBaseService
+from app.model_base_service.db import Base
 from app.model_base_service.model_base import ModelBase
 
 from .user_data import UserData
@@ -30,15 +30,37 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     updated_at = mapped_column(
         "updated_at", DateTime(timezone=True), onupdate=datetime.now
     )
+    user_type_id = mapped_column("user_type_id", Integer, ForeignKey("user_type.id"))
 
-    def _set_password(self, password: str) -> None:
-        self.password = pbkdf2_sha256.hash(password)
+    @property
+    def user_type(self):
+        from .user_type_model import UserTypeModel
+
+        return (
+            self.session.query(UserTypeModel)
+            .filter(UserTypeModel.id == self.user_type_id)
+            .first()
+            .name
+        )
+
+    @property
+    def user_images(self):
+        from .user_image_model import UserImageModel
+
+        userImages: list[UserImageModel] = (
+            self.session.query(UserImageModel)
+            .filter(UserImageModel.user_id == self.id)
+            .all()
+        )
+        if len(userImages) == 0:
+            return []
+        return [img.image_url for img in userImages]
+
+    def _get_model_by_id(self, model_id: str) -> Union["UserModel", None]:
+        return self.session.query(UserModel).filter(UserModel.id == model_id).first()
 
     def _delete(self):
         self.session.delete(self)
-
-    def match_password(self, receive_password: str) -> bool:
-        return pbkdf2_sha256.verify(secret=receive_password, hash=self.password)
 
     def _clean_up_all_model(self) -> list[ModelBase]:
         return self.session.query(UserModel).all()

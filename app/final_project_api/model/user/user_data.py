@@ -1,5 +1,8 @@
 from dataclasses import dataclass, field
 from app.model_base_service import ModelBaseDefault
+from .user_image_data import UserImageData
+from .user_type_data import UserTypeData
+from passlib.hash import pbkdf2_sha256
 
 
 @dataclass
@@ -7,24 +10,21 @@ class UserData(ModelBaseDefault):
     username: str
     password: str
     email: str
+    user_images: list[str] = field(init=False, default_factory=list)
+    user_type_id: int = field(init=False)
+
+    user_type: str = field(init=False)
 
     def __init__(self, username: str, email: str, password: str):
         super().__init__()
         self.username = username
         self.email = email
-        self.password = password
         self._set_password(password)
+        self.user_type_id = 1
+        # self.user_images = []
 
-    def _set_password(self, password: str):
-        raise Exception(f"{self.__class__} not implement _set_password")
+    def _set_password(self, password: str) -> None:
+        self.password = pbkdf2_sha256.hash(password)
 
     def match_password(self, receive_password: str) -> bool:
-        raise Exception(f"{self.__class__} not implement _match_password")
-
-    def create_account(self) -> int:
-        """create_account
-        method will call when user create some account
-        Raises:
-            Exception: _description_
-        """
-        raise Exception(f"{self.__class__} not implement account_get_create")
+        return pbkdf2_sha256.verify(secret=receive_password, hash=self.password)
