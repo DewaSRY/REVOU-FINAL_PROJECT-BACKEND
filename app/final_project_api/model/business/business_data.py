@@ -19,7 +19,6 @@ class BusinessDate(DataBaseDefault):
         self.user_id = user_id
         self.business_name = business_name
         self._set_match_business_type(business_type_name=business_type_name)
-        # self.business_images = []
 
     def _set_match_business_type(self, business_type_name: str):
         raise Exception(f"{self.__class__} not implement _set_match_business_type ")

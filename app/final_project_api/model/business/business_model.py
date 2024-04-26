@@ -46,3 +46,6 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
             .first()
         )
         self.business_type_id = businessType.id
+
+    def _clean_up_all_model(self):
+        return self.session.query(BusinessModel).all()
