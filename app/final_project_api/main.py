@@ -6,6 +6,8 @@ from flask_cors import CORS, cross_origin
 from app.database_connector import getSqliteConnector
 from app.model_base_service import db
 
+from .views import UserBluePrint
+
 
 def create_app(db_url=None):
     app = Flask(__name__)
@@ -32,7 +34,7 @@ def create_app(db_url=None):
     @jwt.additional_claims_loader
     def add_claims_to_jwt(identity):
         # Look in the database and see whether the user is an admin
-        return {"current_id": identity}
+        return {"current_id": identity, "is_admin": False}
 
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
@@ -62,7 +64,7 @@ def create_app(db_url=None):
             401,
         )
 
-    # api.register_blueprint(UserBluePrint)
+    api.register_blueprint(UserBluePrint)
     # api.register_blueprint(AccountBluePrint)
     # api.register_blueprint(BillsBluePrint)
     # api.register_blueprint(TransactionBluePrint)

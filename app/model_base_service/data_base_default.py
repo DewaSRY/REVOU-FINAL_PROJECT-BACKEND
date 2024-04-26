@@ -7,7 +7,7 @@ from uuid import uuid4
 
 
 @dataclass
-class ModelBaseDefault:
+class DataBaseDefault:
     """ModelBaseDefault
     will inherit property
         - id

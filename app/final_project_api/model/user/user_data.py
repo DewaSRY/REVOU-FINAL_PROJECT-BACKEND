@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
-from app.model_base_service import ModelBaseDefault
+from app.model_base_service import DataBaseDefault
 from .user_image_data import UserImageData
 from .user_type_data import UserTypeData
 from passlib.hash import pbkdf2_sha256
 
 
 @dataclass
-class UserData(ModelBaseDefault):
+class UserData(DataBaseDefault):
     username: str
     password: str
     email: str

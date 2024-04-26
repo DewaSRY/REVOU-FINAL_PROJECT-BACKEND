@@ -9,6 +9,7 @@ import json
 class MassageService:
     default_locale = "en-gb"
     cached_strings = {}
+    
     @classmethod
     def refresh(cls):
         print("Refreshing...")
