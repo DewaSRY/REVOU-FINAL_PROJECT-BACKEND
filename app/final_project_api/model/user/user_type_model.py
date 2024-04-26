@@ -34,8 +34,11 @@ class UserTypeModel(
 
     @classmethod
     def add_model(cls, name: str) -> "UserTypeModel":
-        model = UserTypeModel(name=name)
-        DataStore.USER_TYPE_LIST.append(model.name)
-        cls.session.add(model)
-        cls.session.commit()
-        return model
+        try:
+            model = UserTypeModel(name=name)
+            DataStore.USER_TYPE_LIST.append(model.name)
+            cls.session.add(model)
+            cls.session.commit()
+            return model
+        except Exception as e:
+            print(e)

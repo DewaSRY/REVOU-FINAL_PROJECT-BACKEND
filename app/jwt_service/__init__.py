@@ -16,6 +16,11 @@ def getCurrentAuthId():
     return jwt.get("current_id")
 
 
+def getIsUserAdmin():
+    jwt = get_jwt()
+    return jwt.get("is_admin")
+
+
 def createAccessToken(user_id: str, user_type: str):
     return create_access_token(
         identity=JWTData(user_id=user_id, user_type=user_type),

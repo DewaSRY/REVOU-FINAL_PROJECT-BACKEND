@@ -69,8 +69,9 @@ def create_app(db_url=None):
 
     with app.app_context():
         db.create_all()
-        UserTypeModel.add_model(name="user")
-        UserTypeModel.add_model(name="admin")
+        if len((UserTypeModel.get_all_model())) == 0:
+            UserTypeModel.add_model(name="user")
+            UserTypeModel.add_model(name="admin")
     api.register_blueprint(UserBluePrint)
 
     return app
