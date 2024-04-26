@@ -26,7 +26,7 @@ class TestUserModel(MockDatabaseConnection):
         userPassword = "some password"
         userEmail = "some Email"
         user_create = UserModel.add_model(
-            UserModel(username=userName, email=userEmail, password=userPassword)
+            username=userName, email=userEmail, password=userPassword
         )
         assert user_create.user_type_id == self.user_type_one.id
         assert user_create.password != userPassword
@@ -38,11 +38,12 @@ class TestUserModel(MockDatabaseConnection):
         userPassword = "some password to update"
         userEmail = "some Email to update"
         user_create = UserModel.add_model(
-            UserModel(username=userName, email=userEmail, password=userPassword)
+            username=userName, email=userEmail, password=userPassword
         )
         assert user_create.user_type_id == self.user_type_one.id
         assert user_create.password != userPassword
         assert user_create.match_password(userPassword) == True
+
         assert user_create.user_type == self.user_type_one.name
         newUserName = "new name"
         newUSerPassword = "new password"
@@ -59,11 +60,9 @@ class TestUserModel(MockDatabaseConnection):
 
     def test_user_create_images(self):
         create_user = UserModel.add_model(
-            UserModel(
-                username="create image",
-                email="create image",
-                password="create image",
-            )
+            username="create image two",
+            email="create image",
+            password="create image",
         )
 
         image_one, image_two, image_three = UserImageModel.add_all_model(
@@ -77,3 +76,37 @@ class TestUserModel(MockDatabaseConnection):
         assert image_one.image_url == user_image_one
         assert image_two.image_url == user_image_two
         assert image_three.image_url == user_image_three
+
+    def test_error_create_same_user_with_same_user_name(self):
+        user_create = UserModel.add_model(
+            username="create user name",
+            email="create email",
+            password="create password",
+        )
+        try:
+            same_user = UserModel.add_model(
+                username=user_create.username,
+                password="some password create",
+                email="some email create",
+            )
+        except Exception as e:
+            assert str(e) == f"username: {user_create.username} already use"
+        finally:
+            UserModel.delete_model(user_create)
+
+    def test_error_create_same_user_with_same_email(self):
+        user_create = UserModel.add_model(
+            username="create user name second",
+            email="createemailsecontest@gmail.come",
+            password="create password",
+        )
+        try:
+            same_user_two = UserModel.add_model(
+                username="another user name test",
+                password="some password create",
+                email=user_create.email,
+            )
+        except Exception as e:
+            assert str(e) == f"email: {user_create.email} already use"
+        finally:
+            UserModel.delete_model(user_create)

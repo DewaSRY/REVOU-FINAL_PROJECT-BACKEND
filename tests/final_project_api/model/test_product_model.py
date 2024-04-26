@@ -25,11 +25,9 @@ class TestProductModel(MockDatabaseConnection):
     def setup_class(self):
         super().setup_class(self)
         self.user_test = UserModel.add_model(
-            UserModel(
-                username="business name",
-                email="business email",
-                password="business password",
-            )
+            username="business name",
+            email="business email",
+            password="business password",
         )
         self.business_type_test = BusinessTypeModel.add_model(
             BusinessTypeModel(name="some name")

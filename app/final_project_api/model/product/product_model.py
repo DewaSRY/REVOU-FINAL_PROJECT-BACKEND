@@ -14,10 +14,10 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
     id = mapped_column("product_id", String(36), primary_key=True)
     product_name = mapped_column("product_name", String(50))
     product_price = mapped_column("product_price", Float(10.2))
-    created_at = mapped_column(
+    create_at = mapped_column(
         "created_at", DateTime(timezone=True), server_default=func.now()
     )
-    updated_at = mapped_column(
+    update_at = mapped_column(
         "updated_at", DateTime(timezone=True), onupdate=datetime.now
     )
     user_id = mapped_column("user_id", String(36), ForeignKey("user.user_id"))

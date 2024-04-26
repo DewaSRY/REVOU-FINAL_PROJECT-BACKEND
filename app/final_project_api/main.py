@@ -7,6 +7,7 @@ from app.database_connector import getSqliteConnector
 from app.model_base_service import db
 
 from .views import UserBluePrint
+from .model.user import UserTypeModel
 
 
 def create_app(db_url=None):
@@ -64,6 +65,34 @@ def create_app(db_url=None):
             401,
         )
 
+    with app.app_context():
+        db.create_all()
+        if len(UserTypeModel.query.all()) == 0:
+            UserTypeModel.add_all_model(
+                [
+                    UserTypeModel("user"),
+                    UserTypeModel("admin"),
+                ]
+            )
+            # TransactionTypeModel.add_all_model(
+            #     [
+            #         TransactionTypeModel("groceries"),
+            #         TransactionTypeModel("rent"),
+            #         TransactionTypeModel("entertainment"),
+            #         TransactionTypeModel("deposit"),
+            #         TransactionTypeModel("withdrawal"),
+            #         TransactionTypeModel("transfer"),
+            #         TransactionTypeModel("receive"),
+            #     ]
+            # )
+            # AccountTypeModel.add_all_model(
+            #     [
+            #         AccountTypeModel("checking"),
+            #         AccountTypeModel("saving"),
+            #     ]
+            # )
+        # DataStore.store_account_type(AccountTypeModel.query.all())
+        # DataStore.store_transaction_type(TransactionTypeModel.query.all())
     api.register_blueprint(UserBluePrint)
     # api.register_blueprint(AccountBluePrint)
     # api.register_blueprint(BillsBluePrint)
