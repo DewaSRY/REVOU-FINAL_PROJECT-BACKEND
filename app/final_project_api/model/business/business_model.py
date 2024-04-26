@@ -9,8 +9,8 @@ from app.model_base_service import db, ModelBaseService
 
 class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
     __tablename__ = "business"
-    id = mapped_column("id", String(36), primary_key=True)
-    user_id = mapped_column("user_id", String(36), ForeignKey("user.id"))
+    id = mapped_column("business_id", String(36), primary_key=True)
+    user_id = mapped_column("user_id", String(36), ForeignKey("user.user_id"))
     business_name = mapped_column("name", String(50))
 
     @property

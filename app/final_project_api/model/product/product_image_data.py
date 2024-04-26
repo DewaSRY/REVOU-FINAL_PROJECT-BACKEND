@@ -6,9 +6,9 @@ from app.image_upload_service import ImageData
 
 
 @dataclass
-class BusinessImageData(ImageData):
-    business_id: str
+class ProductImageData(ImageData):
+    product_id: str
 
-    def __init__(self, image_url: str, business_id: str):
+    def __init__(self, image_url: str, product_id: str):
         super().__init__(image_url=image_url)
-        self.business_id = business_id
+        self.product_id = product_id
