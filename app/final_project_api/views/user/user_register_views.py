@@ -38,22 +38,17 @@ class UserRegisterView(MethodView):
             _type_: _description_
         """
         try:
-            print(item_data)
             user = UserModel.add_model(
-                UserModel(
-                    email=item_data.email,
-                    username=item_data.username,
-                    password=item_data.password,
-                )
+                email=item_data.email,
+                username=item_data.username,
+                password=item_data.password,
             )
-
             access_token = create_access_token(
                 identity=user.id, expires_delta=timedelta(days=7)
             )
             return AuthResponseData(user_model=user, access_token=access_token)
         except Exception as E:
-            print(E)
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
-                message="error while create",
+                message=str(E),
             )

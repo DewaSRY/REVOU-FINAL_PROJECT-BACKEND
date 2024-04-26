@@ -12,7 +12,6 @@ class UserData(DataBaseDefault):
     email: str
     user_images: list[str] = field(init=False, default_factory=list)
     user_type_id: int = field(init=False)
-
     user_type: str = field(init=False)
 
     def __init__(self, username: str, email: str, password: str):

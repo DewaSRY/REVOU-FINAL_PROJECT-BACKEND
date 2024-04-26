@@ -36,14 +36,18 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     @property
     def user_type(self):
         from .user_type_model import UserTypeModel
+        from app.data_store_service import DataStore
 
-        type = (
-            self.session.query(UserTypeModel)
-            .filter(UserTypeModel.id == self.user_type_id)
-            .first()
-        )
+        # type = UserTypeModel.query.filter(UserTypeModel.id == self.user_type_id).first()
+        type = UserTypeModel.get_model_by_id(self.user_type_id)
+
         if type == None:
-            raise Exception(f"please use register type")
+            typeOne, typeTwo = UserTypeModel.query.all()
+            getTypy = UserTypeModel.get_model_by_id(self.user_type_id)
+            raise Exception(
+                # f"please use register type :{str(DataStore.USER_TYPE_LIST)} "
+                f"please use register type :{type} {getTypy} {typeOne} {typeTwo} {str(DataStore.USER_TYPE_LIST)} {self.user_type_id} "
+            )
         return type.name
 
     @property
