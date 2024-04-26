@@ -49,3 +49,11 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
 
     def _clean_up_all_model(self):
         return self.session.query(BusinessModel).all()
+
+    @classmethod
+    def get_business_by_user_id(cls, user_id: str) -> list["BusinessModel"]:
+        return (
+            cls.session.query(BusinessModel)
+            .filter(BusinessModel.user_id == user_id)
+            .all()
+        )

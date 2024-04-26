@@ -8,7 +8,8 @@ from app.model_base_service import db
 
 from .views import UserBluePrint
 from .model.user import UserTypeModel
-from app.data_store_service import DataStore
+
+from app.jwt_service import JWTData
 
 
 def create_app(db_url=None):
@@ -34,9 +35,9 @@ def create_app(db_url=None):
     cors = CORS(app)
 
     @jwt.additional_claims_loader
-    def add_claims_to_jwt(identity):
+    def add_claims_to_jwt(jwt_data: JWTData):
         # Look in the database and see whether the user is an admin
-        return {"current_id": identity, "is_admin": False}
+        return jwt_data.to_json()
 
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
@@ -68,15 +69,8 @@ def create_app(db_url=None):
 
     with app.app_context():
         db.create_all()
-        UserTypeModel.add_all_model(
-            [
-                UserTypeModel("user"),
-                UserTypeModel("admin"),
-            ]
-        )
-        allUserType = UserTypeModel.query.all()
-        DataStore.store_user_type(models=allUserType)
-
+        UserTypeModel.add_model(name="user")
+        UserTypeModel.add_model(name="admin")
     api.register_blueprint(UserBluePrint)
 
     return app

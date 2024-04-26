@@ -14,6 +14,7 @@ from app.final_project_api.model.user import (
     AuthResponseSchema,
 )
 from app.datetime_service import getDateTimeLimit
+from app.jwt_service import createAccessToken
 from flask_jwt_extended import (
     create_access_token,
 )
@@ -42,9 +43,7 @@ class UserLoginViews(MethodView):
         )
 
         if user and user.match_password(receive_password=user_data.password):
-            access_token = create_access_token(
-                identity=user.id, expires_delta=timedelta(days=7)
-            )
+            access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
             return AuthResponseData(user_model=user, access_token=access_token)
 
         abort(http_status_code=HTTPStatus.FORBIDDEN, message="Invalid credentials")

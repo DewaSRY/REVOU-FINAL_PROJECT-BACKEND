@@ -103,11 +103,15 @@ class ModelBaseService[T](ModelBase):
         cls.delete_model(model=model)
 
     @classmethod
+    def get_all_model(cls: "ModelBaseService") -> list["ModelBaseService"]:
+        return cls._get_all_model(cls)
+
+    @classmethod
     def clean_all_model(cls):
         """clean_all_model
         use to delete all model
         """
-        all_model_to_clean: list[ModelBase] = cls._clean_up_all_model(cls)
+        all_model_to_clean: list[ModelBase] = cls._get_all_model(cls)
         for model in all_model_to_clean:
             model._delete()
             cls.session.commit()

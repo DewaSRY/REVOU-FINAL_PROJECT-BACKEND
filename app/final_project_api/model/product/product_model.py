@@ -47,3 +47,11 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
             .first()
             .user_id
         )
+
+    @classmethod
+    def get_business_by_user_id(cls, user_id: str) -> list["ProductModel"]:
+        return (
+            cls.session.query(ProductModel)
+            .filter(ProductModel.user_id == user_id)
+            .all()
+        )

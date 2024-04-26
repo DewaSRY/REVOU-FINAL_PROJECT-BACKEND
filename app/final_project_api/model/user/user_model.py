@@ -34,19 +34,26 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     user_type_id = mapped_column("user_type_id", Integer, ForeignKey("user_type.id"))
 
     @property
+    def business(self):
+        from app.final_project_api.model.business import BusinessModel
+
+        return BusinessModel.get_business_by_user_id(self.id)
+
+    @property
+    def product(self):
+        from app.final_project_api.model.product import ProductModel
+
+        return ProductModel.get_business_by_user_id(self.id)
+
+    @property
     def user_type(self):
         from .user_type_model import UserTypeModel
         from app.data_store_service import DataStore
 
-        # type = UserTypeModel.query.filter(UserTypeModel.id == self.user_type_id).first()
         type = UserTypeModel.get_model_by_id(self.user_type_id)
-
         if type == None:
-            typeOne, typeTwo = UserTypeModel.query.all()
-            getTypy = UserTypeModel.get_model_by_id(self.user_type_id)
             raise Exception(
-                # f"please use register type :{str(DataStore.USER_TYPE_LIST)} "
-                f"please use register type :{type} {getTypy} {typeOne} {typeTwo} {str(DataStore.USER_TYPE_LIST)} {self.user_type_id} "
+                f"please use register type :{str(DataStore.USER_TYPE_LIST)} "
             )
         return type.name
 
@@ -54,22 +61,16 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     def user_images(self):
         from .user_image_model import UserImageModel
 
-        userImages: list[UserImageModel] = (
-            self.session.query(UserImageModel)
-            .filter(UserImageModel.user_id == self.id)
-            .all()
-        )
+        userImages = UserImageModel.get_image_by_user_id(self.id)
         if len(userImages) == 0:
             return []
+
         return [img.image_url for img in userImages]
 
     def _get_model_by_id(self, model_id: str) -> Union["UserModel", None]:
         return self.session.query(UserModel).filter(UserModel.id == model_id).first()
 
-    def _delete(self):
-        self.session.delete(self)
-
-    def _clean_up_all_model(self) -> list[ModelBase]:
+    def _get_all_model(self) -> list[ModelBase]:
         return self.session.query(UserModel).all()
 
     def _update(self, username: str = None, email: str = None, password: str = None):
@@ -95,7 +96,6 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     def add_model(cls, username: str, email: str, password) -> UserData:
         model = UserModel(username=username, email=email, password=password)
         model_pointer = cls.session.query(UserModel)
-
         if len(model_pointer.all()) != 0:
             if model_pointer.filter(UserModel.username == (username)).first() != None:
                 raise Exception(f"username: {username} already use")

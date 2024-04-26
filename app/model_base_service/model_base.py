@@ -20,8 +20,8 @@ class ModelBase:
             f"{self.__class__} _delete not implement, need to implement this method to receive the service"
         )
 
-    def _clean_up_all_model(self):
-        raise Exception(f"{self.__class__} not implement __clean_up_all_model")
+    def _get_all_model(self):
+        raise Exception(f"{self.__class__} not implement __get_all_model")
 
     def _get_model_by_id(self, model_id: Union[str, int]) -> Union[Base, None]:
         raise Exception(f"{self.__class__} not implement _get_model_by_id")

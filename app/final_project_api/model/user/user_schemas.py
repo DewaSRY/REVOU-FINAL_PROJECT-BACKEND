@@ -5,6 +5,8 @@ from marshmallow import Schema, fields, post_load
 from dataclasses import dataclass, field
 from .user_data import UserData
 from datetime import datetime
+from app.final_project_api.model.business import BusinessSchemas, BusinessDate
+from app.final_project_api.model.product import ProductSchema, ProductData
 
 
 @dataclass
@@ -47,6 +49,8 @@ class AuthResponseData:
     images: list[str]
     username: str = field(default_factory=str)
     email: str = field(default_factory=str)
+    business: list["BusinessDate"] = field(default_factory=list, repr=False)
+    product: list["ProductData"] = field(default_factory=list, repr=False)
 
     def __init__(self, user_model: UserData, access_token: str):
         self.user_id = user_model.id
@@ -57,6 +61,8 @@ class AuthResponseData:
         self.username = user_model.username
         self.user_type = user_model.user_type
         self.images = user_model.user_images
+        self.business = user_model.business
+        self.product = user_model.product
 
 
 class AuthResponseSchema(RegisterSchema):
@@ -71,3 +77,6 @@ class AuthResponseSchema(RegisterSchema):
     username = fields.Str()
     user_type = fields.Str()
     images = fields.List(fields.Str)
+
+    business = fields.List(fields.Nested(BusinessSchemas), dump_only=True)
+    product = fields.List(fields.Nested(ProductSchema), dump_only=True)

@@ -21,6 +21,8 @@ from flask_jwt_extended import (
 )
 from app.model_base_service import db
 
+from app.jwt_service import createAccessToken
+
 
 @blp.route("/user/register")
 class UserRegisterView(MethodView):
@@ -43,9 +45,7 @@ class UserRegisterView(MethodView):
                 username=item_data.username,
                 password=item_data.password,
             )
-            access_token = create_access_token(
-                identity=user.id, expires_delta=timedelta(days=7)
-            )
+            access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
             return AuthResponseData(user_model=user, access_token=access_token)
         except Exception as E:
             abort(

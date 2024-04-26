@@ -38,5 +38,5 @@ class MockModelBase(MockData, ModelBaseService["MockModelBase"], db.Model):
     def _delete(self):
         self.session.delete(self)
 
-    def _clean_up_all_model(self) -> list["MockModelBase"]:
+    def _get_all_model(self) -> list["MockModelBase"]:
         return self.session.query(MockModelBase).all()

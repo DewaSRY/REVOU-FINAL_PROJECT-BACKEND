@@ -1,12 +1,11 @@
 """_summary_
 """
 
-from app.model_base_service.db import Base
 from .user_type_data import UserTypeData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import Integer, String
 from app.model_base_service import db, ModelBaseService
-from app.data_store_service import DataStoreable
+from app.data_store_service import DataStoreable, DataStore
 
 
 class UserTypeModel(
@@ -25,9 +24,18 @@ class UserTypeModel(
             .filter(UserTypeModel.id == model_id)
             .first()
         )
-        print(f"type id is {model_id} model is {model}")
-
         return model
+
+    def _get_all_model(self) -> list["UserTypeModel"]:
+        return self.session.query(UserTypeModel).all()
 
     def get_store(self) -> str:
         return self.name
+
+    @classmethod
+    def add_model(cls, name: str) -> "UserTypeModel":
+        model = UserTypeModel(name=name)
+        DataStore.USER_TYPE_LIST.append(model.name)
+        cls.session.add(model)
+        cls.session.commit()
+        return model
