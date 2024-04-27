@@ -1,6 +1,7 @@
 """_summary_
 """
 
+from app.model_base_service.db import Base
 from .product_data import ProductData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.sql import func
@@ -27,6 +28,20 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
     )
 
     @property
+    def business_name(self):
+        from app.final_project_api.model.business import BusinessModel
+
+        model: BusinessModel = BusinessModel.get_model_by_id(model_id=self.business_id)
+        return model.business_name
+
+    @property
+    def username(self):
+        from app.final_project_api.model.user import UserModel
+
+        model: UserModel = UserModel.get_model_by_id(model_id=self.user_id)
+        return model.username
+
+    @property
     def product_images(self):
         from .product_image_model import ProductImageModel
 
@@ -48,6 +63,27 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
             .first()
             .user_id
         )
+
+    def _get_all_model(self):
+        return self.session.query(ProductModel).all()
+
+    def _get_model_by_id(self, model_id: str) -> "ProductModel":
+        return (
+            self.session.query(ProductModel).filter(ProductModel.id == model_id).first()
+        )
+
+    @classmethod
+    def add_model(
+        cls, business_id: str, product_name: str, product_price: float
+    ) -> "ProductModel":
+        model = ProductModel(
+            business_id=business_id,
+            product_name=product_name,
+            product_price=product_price,
+        )
+        cls.session.add(model)
+        cls.session.commit()
+        return model
 
     @classmethod
     def get_by_user_id(cls, user_id: str) -> list["ProductModel"]:

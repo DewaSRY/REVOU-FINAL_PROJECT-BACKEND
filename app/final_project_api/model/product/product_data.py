@@ -12,6 +12,8 @@ class ProductData(DataBaseDefault):
     product_images: list[str] = field(init=False, default_factory=list)
     business_id: str
     user_id: str
+    business_name: str = field(init=False, default_factory=str)
+    username: str = field(init=False, default_factory=str)
 
     def __init__(self, product_name: str, product_price: float, business_id: str):
         super().__init__()

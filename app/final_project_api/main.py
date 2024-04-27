@@ -6,7 +6,7 @@ from flask_cors import CORS, cross_origin
 from app.database_connector import getSqliteConnector
 from app.model_base_service import db
 
-from .views import UserBluePrint, BusinessBluePrint
+from .views import UserBluePrint, BusinessBluePrint, ProductBluePrint
 from .model.user import UserTypeModel
 from .model.business import BusinessTypeModel
 
@@ -79,5 +79,6 @@ def create_app(db_url=None):
 
     api.register_blueprint(UserBluePrint)
     api.register_blueprint(BusinessBluePrint)
+    api.register_blueprint(ProductBluePrint)
 
     return app

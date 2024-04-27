@@ -9,5 +9,5 @@
 - [] explain lib use on project at readme
 - [] explain structure project at readme
 
-- [] create business view
+- [x] create business view
 - [] create product view

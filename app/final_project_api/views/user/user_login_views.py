@@ -3,9 +3,9 @@
 
 from flask_smorest import abort
 from flask.views import MethodView
-from .user_blp import blp
 from http import HTTPStatus
-from datetime import timedelta
+
+from .user_blp import blp
 from app.final_project_api.model.user import (
     UserModel,
     LoginSchemas,
@@ -15,9 +15,7 @@ from app.final_project_api.model.user import (
 )
 from app.datetime_service import getDateTimeLimit
 from app.jwt_service import createAccessToken
-from flask_jwt_extended import (
-    create_access_token,
-)
+
 
 # from pprint import pprint
 
