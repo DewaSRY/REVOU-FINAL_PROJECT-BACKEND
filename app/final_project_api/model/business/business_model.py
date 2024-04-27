@@ -1,11 +1,11 @@
 """_summary_
 """
 
-from app.model_base_service.db import Base
 from .business_data import BusinessDate
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import ForeignKey, String, Integer
+from sqlalchemy import ForeignKey, String
 from app.model_base_service import db, ModelBaseService
+from sqlalchemy_utils.types.uuid import UUIDType
 
 
 class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
@@ -35,14 +35,10 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
 
     @property
     def business_types(self):
-        from .business_type_model import BusinessTypeModel
+        from .business_type_model import BusinessTypeModel as BTM
 
-        return (
-            self.session.query(BusinessTypeModel)
-            .filter(BusinessTypeModel.id == self.business_type_id)
-            .first()
-            .name
-        )
+        model: BTM = BTM.get_model_by_id(model_id=self.business_type_id)
+        return model.name
 
     def _set_match_business_type(self, business_type_name: str):
         from .business_type_model import BusinessTypeModel as BT
@@ -84,7 +80,6 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
         Returns:
             BusinessModel: _description_
         """
-
         model: BusinessModel
         try:
             model = BusinessModel(

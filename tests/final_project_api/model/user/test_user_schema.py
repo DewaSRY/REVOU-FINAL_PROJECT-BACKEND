@@ -1,7 +1,7 @@
 """_summary_
 """
 
-from app.final_project_api.model.user import LoginSchemas, AuthData
+from app.final_project_api.schema.user.user_schemas import LoginSchemas, AuthData
 from unittest import TestCase
 from pprint import pprint
 

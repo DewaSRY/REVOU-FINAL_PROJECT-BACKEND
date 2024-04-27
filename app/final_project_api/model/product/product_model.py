@@ -55,14 +55,10 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
         return [img.image_url for img in imageList]
 
     def _set_user_id(self):
-        from app.final_project_api.model.business import BusinessModel
+        from app.final_project_api.model.business import BusinessModel as BM
 
-        self.user_id = (
-            self.session.query(BusinessModel)
-            .filter(BusinessModel.id == self.business_id)
-            .first()
-            .user_id
-        )
+        model: BM = BM.get_model_by_id(model_id=self.business_id)
+        self.user_id = model.user_id
 
     def _get_all_model(self):
         return self.session.query(ProductModel).all()

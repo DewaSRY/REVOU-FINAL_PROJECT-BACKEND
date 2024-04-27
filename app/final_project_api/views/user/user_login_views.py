@@ -8,14 +8,16 @@ from http import HTTPStatus
 from .user_blp import blp
 from app.final_project_api.model.user import (
     UserModel,
+)
+from app.datetime_service import getDateTimeLimit
+from app.jwt_service import createAccessToken
+
+from ...schema.user import (
     LoginSchemas,
     AuthData,
     AuthResponseData,
     UserModelSchema,
 )
-from app.datetime_service import getDateTimeLimit
-from app.jwt_service import createAccessToken
-
 
 # from pprint import pprint
 

@@ -8,22 +8,28 @@ from http import HTTPStatus
 from app.final_project_api.model.business import (
     BusinessImageData,
     BusinessImageModel,
-    BusinessSchemas,
     BusinessTypeData,
     BusinessTypeModel,
-    BusinessCreateData,
-    BusinessCreateSchema,
     BusinessModel,
-    BusinessModelSchema,
 )
 from app.jwt_service import getCurrentAuthId
 from flask_jwt_extended import jwt_required
+from ...schema.business import (
+    BusinessModelSchema,
+    QueryBusinessSchema,
+    QueryBusinessData,
+    BusinessCreateData,
+    BusinessCreateSchema,
+    BusinessSchemas,
+)
 
 
 @blp.route("/business")
 class BusinessViews(MethodView):
+    @blp.arguments(schema=QueryBusinessSchema, location="query")
     @blp.response(schema=BusinessSchemas(many=True), status_code=HTTPStatus.OK)
-    def get(self):
+    def get(self, query_args: QueryBusinessData):
+        print(query_args)
         return BusinessModel.get_all_model()
 
     @jwt_required()

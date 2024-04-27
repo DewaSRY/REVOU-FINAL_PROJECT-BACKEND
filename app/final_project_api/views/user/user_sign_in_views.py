@@ -11,6 +11,8 @@ from http import HTTPStatus
 from datetime import timedelta
 from app.final_project_api.model.user import (
     UserModel,
+)
+from ...schema.user import (
     RegisterSchema,
     AuthData,
     AuthResponseData,

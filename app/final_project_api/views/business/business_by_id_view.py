@@ -8,16 +8,18 @@ from http import HTTPStatus
 from app.final_project_api.model.business import (
     BusinessImageData,
     BusinessImageModel,
-    BusinessSchemas,
     BusinessTypeData,
     BusinessTypeModel,
-    BusinessCreateData,
-    BusinessCreateSchema,
     BusinessModel,
-    BusinessModelSchema,
 )
 from app.jwt_service import getCurrentAuthId
 from flask_jwt_extended import jwt_required
+from ...schema.business import (
+    BusinessModelSchema,
+    BusinessCreateData,
+    BusinessCreateSchema,
+    BusinessSchemas,
+)
 
 
 @blp.route("/business/<string:business_id>")

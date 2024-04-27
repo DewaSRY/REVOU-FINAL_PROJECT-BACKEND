@@ -9,14 +9,16 @@ from flask_jwt_extended import jwt_required
 
 from .product_blp import blp
 from app.final_project_api.model.product import (
-    ProductCreateData,
-    ProductCreateSchema,
     ProductData,
     ProductImageData,
     ProductImageModel,
     ProductModel,
+)
+from ...schema.product import (
     ProductSchema,
     ProductModelSchema,
+    ProductCreateData,
+    ProductCreateSchema,
 )
 
 

@@ -1,10 +1,12 @@
 """_summary_
 """
 
-from .business_image_data import BusinessImageData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import String, Integer, ForeignKey
+
 from app.model_base_service import db, ModelBaseService
+
+from .business_image_data import BusinessImageData
 
 
 class BusinessImageModel(

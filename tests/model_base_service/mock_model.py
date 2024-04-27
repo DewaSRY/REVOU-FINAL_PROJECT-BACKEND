@@ -20,6 +20,7 @@ from typing import Union
 class MockModelBase(MockData, ModelBaseService["MockModelBase"], db.Model):
     id = mapped_column("data_id", Integer, primary_key=True)
     name = mapped_column("name", String(50))
+    username = ""
 
     def __init__(self, name: str) -> None:
         self.name = name

@@ -10,12 +10,14 @@ from .user_blp import blp
 from http import HTTPStatus
 from app.final_project_api.model.user import (
     UserModel,
+)
+
+from ...schema.user import (
     RegisterSchema,
     AuthData,
     AuthResponseData,
     UserModelSchema,
 )
-
 
 from app.jwt_service import createAccessToken
 

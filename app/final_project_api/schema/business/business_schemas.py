@@ -2,8 +2,17 @@
 """
 
 from marshmallow import Schema, fields, post_load
-from dataclasses import dataclass, field
-from app.final_project_api.model.product import ProductSchema
+from app.final_project_api.schema.product.product_schemas import ProductSchema
+from .business_data import QueryBusinessData, BusinessCreateData
+
+
+class QueryBusinessSchema(Schema):
+    page = fields.Integer()
+    limit = fields.Integer()
+
+    @post_load
+    def get_data(self, data, **kwargs):
+        return QueryBusinessData(**data)
 
 
 class BusinessSchemas(Schema):
@@ -11,12 +20,6 @@ class BusinessSchemas(Schema):
     business_name = fields.Str()
     business_images = fields.List(fields.Str())
     id = fields.Str()
-
-
-@dataclass
-class BusinessCreateData:
-    business_name: str
-    business_types: str
 
 
 class BusinessCreateSchema(Schema):

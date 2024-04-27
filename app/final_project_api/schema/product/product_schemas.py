@@ -2,7 +2,7 @@
 """
 
 from marshmallow import Schema, fields, post_load
-from dataclasses import dataclass, field
+from .product_data import ProductCreateData
 
 
 class ProductSchema(Schema):
@@ -10,13 +10,6 @@ class ProductSchema(Schema):
     product_price = fields.Float()
     product_images = fields.List(fields.Str())
     id = fields.Str()
-
-
-@dataclass
-class ProductCreateData:
-    product_name: str
-    product_price: float
-    business_id: str
 
 
 class ProductCreateSchema(Schema):

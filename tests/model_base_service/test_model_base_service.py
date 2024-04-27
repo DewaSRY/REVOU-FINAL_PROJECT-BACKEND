@@ -3,6 +3,8 @@
 
 from tests.mock_database_connection import MockDatabaseConnection
 from .mock_model import MockModelBase
+from .mock_data import MockData
+from pprint import pprint
 
 
 class TestModelBaseService(MockDatabaseConnection):
@@ -23,6 +25,7 @@ class TestModelBaseService(MockDatabaseConnection):
             .filter(MockModelBase.id == testing_mock.id)
             .first()
         )
+
         assert testing_mock == find_match_model
 
     def test_create_by_ModelBaseService(self):
@@ -33,6 +36,8 @@ class TestModelBaseService(MockDatabaseConnection):
             .filter(MockModelBase.name == testing_name)
             .first()
         )
+        # data = MockData(name="some name", username="some user name")
+        # pprint(data, indent=2)
         assert testing_model.name == testing_name
 
     def test_update_by_ModelBaseService(self):
