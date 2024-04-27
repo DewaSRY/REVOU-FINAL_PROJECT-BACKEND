@@ -11,7 +11,7 @@ from app.final_project_api.model.user import (
     LoginSchemas,
     AuthData,
     AuthResponseData,
-    AuthResponseSchema,
+    UserModelSchema,
 )
 from app.datetime_service import getDateTimeLimit
 from app.jwt_service import createAccessToken
@@ -26,7 +26,7 @@ from flask_jwt_extended import (
 class UserLoginViews(MethodView):
 
     @blp.arguments(schema=LoginSchemas)
-    @blp.response(schema=AuthResponseSchema, status_code=HTTPStatus.OK)
+    @blp.response(schema=UserModelSchema, status_code=HTTPStatus.OK)
     @blp.alt_response(
         status_code=HTTPStatus.FORBIDDEN,
         description="user not found",

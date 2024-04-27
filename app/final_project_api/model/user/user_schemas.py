@@ -65,7 +65,7 @@ class AuthResponseData:
         self.product = user_model.product
 
 
-class AuthResponseSchema(RegisterSchema):
+class UserModelSchema(RegisterSchema):
     """schemas to response user schemas"""
 
     user_id = fields.Str()

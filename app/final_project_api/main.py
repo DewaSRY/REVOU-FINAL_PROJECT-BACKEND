@@ -6,8 +6,9 @@ from flask_cors import CORS, cross_origin
 from app.database_connector import getSqliteConnector
 from app.model_base_service import db
 
-from .views import UserBluePrint
+from .views import UserBluePrint, BusinessBluePrint
 from .model.user import UserTypeModel
+from .model.business import BusinessTypeModel
 
 from app.jwt_service import JWTData
 
@@ -72,6 +73,11 @@ def create_app(db_url=None):
         if len((UserTypeModel.get_all_model())) == 0:
             UserTypeModel.add_model(name="user")
             UserTypeModel.add_model(name="admin")
+        if len(BusinessTypeModel.get_all_model()) == 0:
+            BusinessTypeModel.add_model(name="food")
+            BusinessTypeModel.add_model(name="book")
+
     api.register_blueprint(UserBluePrint)
+    api.register_blueprint(BusinessBluePrint)
 
     return app

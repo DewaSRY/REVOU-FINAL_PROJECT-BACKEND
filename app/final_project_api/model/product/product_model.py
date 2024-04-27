@@ -7,6 +7,7 @@ from sqlalchemy.sql import func
 from datetime import datetime
 from sqlalchemy import String, DateTime, Integer, ForeignKey, Float
 from app.model_base_service import db, ModelBaseService
+from typing import Union
 
 
 class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
@@ -49,9 +50,17 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
         )
 
     @classmethod
-    def get_business_by_user_id(cls, user_id: str) -> list["ProductModel"]:
+    def get_by_user_id(cls, user_id: str) -> list["ProductModel"]:
         return (
             cls.session.query(ProductModel)
             .filter(ProductModel.user_id == user_id)
+            .all()
+        )
+
+    @classmethod
+    def get_by_business_id(cls, business_id: str) -> list["ProductModel"]:
+        return (
+            cls.session.query(ProductModel)
+            .filter(ProductModel.business_id == business_id)
             .all()
         )

@@ -10,7 +10,7 @@ from .user_type_model import UserTypeModel
 
 from .user_schemas import (
     LoginSchemas,
-    AuthResponseSchema,
+    UserModelSchema,
     RegisterSchema,
     AuthData,
     AuthResponseData,

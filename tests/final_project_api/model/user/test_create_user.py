@@ -49,7 +49,7 @@ class TestCreateUSer(MockDatabaseConnection):
                 email="another email",
             )
         except Exception as e:
-            assert str(e) == f"username: {self.user_name} already use"
+            assert str(e) == f"username: '{self.user_name}' already use"
 
     def test_create_with_same_username(self):
         try:
@@ -64,5 +64,4 @@ class TestCreateUSer(MockDatabaseConnection):
                 email=self.user_email,
             )
         except Exception as e:
-            pprint(str(e))
-            assert str(e) == f"email: {self.user_email} already use"
+            assert str(e) == f"email: '{self.user_email}' already use"

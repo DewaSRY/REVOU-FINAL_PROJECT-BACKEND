@@ -37,13 +37,13 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     def business(self):
         from app.final_project_api.model.business import BusinessModel
 
-        return BusinessModel.get_business_by_user_id(self.id)
+        return BusinessModel.get_by_user_id(self.id)
 
     @property
     def product(self):
         from app.final_project_api.model.product import ProductModel
 
-        return ProductModel.get_business_by_user_id(self.id)
+        return ProductModel.get_by_user_id(self.id)
 
     @property
     def user_type(self):
@@ -98,9 +98,9 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
         model_pointer = cls.session.query(UserModel)
         if len(model_pointer.all()) != 0:
             if model_pointer.filter(UserModel.username == (username)).first() != None:
-                raise Exception(f"username: {username} already use")
+                raise Exception(f"username: '{username}' already use")
             elif model_pointer.filter(UserModel.email == (email)).first() != None:
-                raise Exception(f"email: {email} already use")
+                raise Exception(f"email: '{email}' already use")
         cls.session.add(model)
         cls.session.commit()
         return model

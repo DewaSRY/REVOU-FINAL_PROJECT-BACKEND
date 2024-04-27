@@ -14,7 +14,7 @@ from app.final_project_api.model.user import (
     RegisterSchema,
     AuthData,
     AuthResponseData,
-    AuthResponseSchema,
+    UserModelSchema,
 )
 from app.jwt_service import createAccessToken, getCurrentAuthId
 from flask_jwt_extended import jwt_required
@@ -24,7 +24,7 @@ from flask_jwt_extended import jwt_required
 class UserSignInView(MethodView):
 
     @jwt_required()
-    @blp.response(status_code=HTTPStatus.CREATED, schema=AuthResponseSchema)
+    @blp.response(status_code=HTTPStatus.CREATED, schema=UserModelSchema)
     @blp.alt_response(
         status_code=HTTPStatus.CONFLICT,
         description="duplicate username",

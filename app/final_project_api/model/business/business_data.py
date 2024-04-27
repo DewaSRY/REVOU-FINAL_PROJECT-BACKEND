@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass, field
 from app.model_base_service import DataBaseDefault
+from app.final_project_api.model.product import ProductData
 
 
 @dataclass(kw_only=True)
@@ -11,8 +12,10 @@ class BusinessDate(DataBaseDefault):
     business_name: str
 
     business_types: str = field(init=False, compare=False)
+
     business_type_id: int = field(init=False)
     business_images: list[str] = field(init=False, default_factory=list)
+    product: list[ProductData] = field(init=False, default_factory=list)
 
     def __init__(self, user_id: str, business_name: str, business_type_name: str):
         super().__init__()

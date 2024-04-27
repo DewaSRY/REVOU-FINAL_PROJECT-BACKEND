@@ -8,3 +8,6 @@
 - [] explain about project at readme
 - [] explain lib use on project at readme
 - [] explain structure project at readme
+
+- [] create business view
+- [] create product view

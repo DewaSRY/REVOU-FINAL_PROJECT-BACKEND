@@ -8,18 +8,14 @@ from flask_smorest import abort
 from flask.views import MethodView
 from .user_blp import blp
 from http import HTTPStatus
-from datetime import timedelta
 from app.final_project_api.model.user import (
     UserModel,
     RegisterSchema,
     AuthData,
     AuthResponseData,
-    AuthResponseSchema,
+    UserModelSchema,
 )
-from flask_jwt_extended import (
-    create_access_token,
-)
-from app.model_base_service import db
+
 
 from app.jwt_service import createAccessToken
 
@@ -27,7 +23,7 @@ from app.jwt_service import createAccessToken
 @blp.route("/user/register")
 class UserRegisterView(MethodView):
     @blp.arguments(schema=RegisterSchema)
-    @blp.response(status_code=HTTPStatus.CREATED, schema=AuthResponseSchema)
+    @blp.response(status_code=HTTPStatus.CREATED, schema=UserModelSchema)
     @blp.alt_response(
         status_code=HTTPStatus.CONFLICT,
         description="duplicate username",
