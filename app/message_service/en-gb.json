@@ -32,5 +32,6 @@
     "image_delete_failed": "Internal server error! Failed to delete image.",
     "avatar_delete_failed": "Internal server error! Failed to delete avatar.",
     "avatar_uploaded": "Avatar '{}' uploaded.",
-    "avatar_not_found": "Avatar not found."
+    "avatar_not_found": "Avatar not found.",
+    "first_massage": "hallo"
 }
