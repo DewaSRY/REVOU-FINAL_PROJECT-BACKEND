@@ -33,5 +33,17 @@
     "avatar_delete_failed": "Internal server error! Failed to delete avatar.",
     "avatar_uploaded": "Avatar '{}' uploaded.",
     "avatar_not_found": "Avatar not found.",
-    "first_massage": "hallo"
+    "first_massage": "hallo",
+    "missing_token": {
+        "description": "Request does not contain an access token.",
+        "error": "authorization_required"
+    },
+    "invalid_token_callback": {
+        "message": "Signature verification failed.",
+        "error": "invalid_token"
+    },
+    "expired_token_callback": {
+        "message": "The token has expired.",
+        "error": "token_expired"
+    }
 }

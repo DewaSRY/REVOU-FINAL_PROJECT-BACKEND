@@ -19,8 +19,12 @@ class MassageService:
             cls.cached_strings = json.load(f)
 
     @classmethod
-    def gettext(cls, name: str):
+    def get_message(cls, key_name: str):
         if bool(cls.cached_strings) != True:
             cls.refresh()
-
-        return cls.cached_strings[name]
+        message: str
+        try:
+            message = cls.cached_strings[key_name]
+        except Exception as e:
+            raise Exception(f"message :'{key_name}' not found")
+        return message

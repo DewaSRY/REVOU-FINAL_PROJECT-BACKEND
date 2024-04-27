@@ -12,8 +12,6 @@ class MockFlask(TestCase):
     def setup_class(self):
         self.app = create_app()
         self.app.config.update(
-            {
-                "TESTING": True,
-            }
+            {"TESTING": True, "SQLALCHEMY_DATABASE_URI": "sqlite:///tests/data.db"}
         )
         self.client: FlaskClient = self.app.test_client()

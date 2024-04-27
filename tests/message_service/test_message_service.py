@@ -11,7 +11,11 @@ class TestMessageService(TestCase):
 
     def test_first_test(self):
 
-        # pprint(MassageService.gettext("first_massage"))
-        # pprint(MassageService.gettext("first_massage"))
-        # pprint(MassageService.gettext("first_massage"))
-        assert MassageService.gettext("first_massage") == "hallo"
+        assert MassageService.get_message("first_massage") == "hallo"
+
+    def test_get_error_message(self):
+        message = "first_massage_two"
+        try:
+            MassageService.get_message(key_name=message)
+        except Exception as e:
+            assert str(e) == f"message :'{message}' not found"
