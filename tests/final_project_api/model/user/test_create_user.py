@@ -66,6 +66,25 @@ class TestCreateUSer(MockDatabaseConnection):
         assert user_create.user_type_id == self.type_user.id
         assert user_create.user_type == self.type_user.name
 
+    def test_get_user_by_email_or_username(self):
+        user_create: UserModel = UserModel.add_model(
+            username=self.user_name, password=self.user_password, email=self.user_email
+        )
+        by_username: UserModel = UserModel.get_by_email_or_username(
+            username=self.user_name, email="100"
+        )
+        by_email: UserModel = UserModel.get_by_email_or_username(
+            username="100", email=self.user_email
+        )
+        by_nothing: UserModel = UserModel.get_by_email_or_username(
+            username="nothing", email="nothing"
+        )
+        # pprint(UserTypeModel.get_all_model(), indent=2)
+        # pprint(user_create, indent=2)
+        assert by_username == user_create
+        assert by_email == user_create
+        assert bool(by_nothing) == False
+
     # @skip("just skip")
     def test_create_with_same_username(self):
         try:
@@ -82,7 +101,7 @@ class TestCreateUSer(MockDatabaseConnection):
         except Exception as e:
             assert str(e) == f"username: '{self.user_name}' already use"
 
-    @skip("just skip")
+    # @skip("just skip")
     def test_create_with_same_username(self):
         try:
             UserModel.add_model(

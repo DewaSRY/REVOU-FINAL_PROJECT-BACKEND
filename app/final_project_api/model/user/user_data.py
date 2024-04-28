@@ -18,6 +18,13 @@ class UserData(DataBaseDefault):
     user_type: str = field(init=False)
     business: list[BusinessDate] = field(init=False, default_factory=list, repr=False)
     product: list[ProductData] = field(init=False, default_factory=list, repr=False)
+    product_amount: int = field(init=False)
+    business_amount: int = field(init=False)
+
+    phone_number: str = field(init=False, default_factory=str)
+    address: str = field(init=False, default_factory=str)
+    occupation: str = field(init=False, default_factory=str)
+    description: str = field(init=False, default_factory=str)
 
     def __init__(self, username: str, email: str, password: str):
         super().__init__()
@@ -26,6 +33,11 @@ class UserData(DataBaseDefault):
         self._set_password(password)
         self.user_type_id = 1
         self.profile_url = ""
+
+        self.phone_number = ""
+        self.address = ""
+        self.occupation = ""
+        self.description = ""
 
     def _set_password(self, password: str) -> None:
         self.password = pbkdf2_sha256.hash(password)

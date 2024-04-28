@@ -1,30 +1,32 @@
 """_summary_
 """
 
-from flask_smorest import abort, Blueprint
-from flask.views import MethodView
+from cloudinary.utils import cloudinary_url
 from http import HTTPStatus
 
+from flask_smorest import abort, Blueprint
+from flask.views import MethodView
 from flask_smorest.fields import Upload
-from cloudinary.utils import cloudinary_url
 from flask_jwt_extended import jwt_required
 
 from app.final_project_api.model.user import (
     UserModel,
 )
 from app.jwt_service import createAccessToken, getCurrentAuthId
-
-from .user_data import (
-    AuthData,
-    AuthResponseData,
-)
-from .user_schemas import LoginSchemas, UserModelSchema, RegisterSchema
 from app.image_upload_service import (
     ImageService,
     ImageSchema,
     ImageData,
     ImagesPayloadData,
 )
+
+from .user_schemas import (
+    LoginSchemas,
+    UserModelSchema,
+    RegisterSchema,
+    UserUpdateSchema,
+)
+from .user_data import AuthData, AuthResponseData, UserUpdateData
 
 blp = Blueprint(
     "users",
@@ -34,6 +36,34 @@ blp = Blueprint(
                 user management end point
                 """,
 )
+
+
+@blp.route("")
+class UserViews(MethodView):
+    @jwt_required()
+    @blp.arguments(schema=UserUpdateSchema)
+    @blp.response(schema=UserModelSchema, status_code=HTTPStatus.CREATED)
+    def put(self, user_data: UserUpdateData):
+
+        duplicateUse: UserModel = UserModel.get_by_email_or_username(
+            username=user_data.username, email=user_data.email
+        )
+        if bool(duplicateUse) == True and duplicateUse.id != getCurrentAuthId():
+            abort(
+                http_status_code=HTTPStatus.CONFLICT,
+                message="user name or email already use ",
+            )
+
+        userModel = UserModel.update_with_id(
+            user_id=getCurrentAuthId(),
+            username=user_data.username,
+            address=user_data.address,
+            description=user_data.description,
+            email=user_data.email,
+            phone_number=user_data.phone_number,
+            occupation=user_data.occupation,
+        )
+        return userModel
 
 
 @blp.route("/login")
@@ -76,6 +106,7 @@ class UserRegisterView(MethodView):
             )
             access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
             return AuthResponseData(user_model=user, access_token=access_token)
+
         except Exception as E:
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
@@ -111,6 +142,5 @@ class ImageUserViews(MethodView):
         image_data: Upload = data.image
         if ImageService.check_extension(image_data=image_data):
             response_data: ImageData = ImageService.image_save(image_data=image_data)
-            # pprint(response_data.secure_url, indent=2)
 
             return {"message": response_data.secure_url}

@@ -1,9 +1,10 @@
 """_summary_
 """
 
+from http import HTTPStatus
+
 from flask_smorest import abort, Blueprint
 from flask.views import MethodView
-from http import HTTPStatus
 from flask_jwt_extended import jwt_required
 
 

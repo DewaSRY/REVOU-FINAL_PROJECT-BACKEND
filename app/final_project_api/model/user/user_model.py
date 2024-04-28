@@ -5,7 +5,7 @@ Returns:
 
 from sqlalchemy.sql import func
 from datetime import datetime
-from sqlalchemy import String, DateTime, Integer, ForeignKey
+from sqlalchemy import String, DateTime, Integer, ForeignKey, Text
 from sqlalchemy.orm import (
     mapped_column,
 )
@@ -23,6 +23,14 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
 
     id = mapped_column("user_id", String(36), primary_key=True)
     username = mapped_column("username", String(50), unique=True, nullable=False)
+
+    phone_number = mapped_column(
+        "phone_number", String(50), unique=True, nullable=False
+    )
+    address = mapped_column("address", String(50), unique=True, nullable=False)
+    occupation = mapped_column("occupation", String(50), unique=True, nullable=False)
+    description = mapped_column("description", Text, unique=True, nullable=False)
+
     email = mapped_column("email", String(50), unique=True)
     profile_url = mapped_column("profile_url", String(50), server_default="")
     password = mapped_column("password_hash", String(200))
@@ -33,6 +41,18 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
         "updated_at", DateTime(timezone=True), onupdate=datetime.now
     )
     user_type_id = mapped_column("user_type_id", Integer, ForeignKey("user_type.id"))
+
+    @property
+    def business_amount(self):
+        from app.final_project_api.model.business import BusinessModel as BM
+
+        return len(BM.get_by_user_id(self.id))
+
+    @property
+    def product_amount(self):
+        from app.final_project_api.model.product import ProductModel as PM
+
+        return len(PM.get_by_user_id(self.id))
 
     @property
     def business(self):
@@ -74,9 +94,26 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     def _get_all_model(self) -> list[ModelBase]:
         return self.session.query(UserModel).all()
 
-    def _update(self, username: str = None, email: str = None, password: str = None):
+    def _update(
+        self,
+        username: str = None,
+        phone_number: str = None,
+        address: str = None,
+        occupation: str = None,
+        description: str = None,
+        email: str = None,
+        password: str = None,
+    ):
         if username != None:
             self.username = username
+        if phone_number != None:
+            self.phone_number = phone_number
+        if address != None:
+            self.address = address
+        if occupation != None:
+            self.occupation = occupation
+        if description != None:
+            self.description = description
         if email != None:
             self.email = email
         if password != None:
@@ -84,16 +121,45 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
         self.update_at = datetime.now()
 
     @classmethod
+    def update_with_id(
+        cls,
+        user_id: str,
+        username: str = None,
+        phone_number: str = None,
+        address: str = None,
+        occupation: str = None,
+        description: str = None,
+        email: str = None,
+        password: str = None,
+    ):
+        userModel: UserModel = UserModel.get_model_by_id(model_id=user_id)
+        userModel._update(
+            username=username,
+            address=address,
+            description=description,
+            email=email,
+            occupation=occupation,
+            password=password,
+            phone_number=phone_number,
+        )
+        cls.session.add(userModel)
+        cls.session.commit()
+        return userModel
+
+    @classmethod
     def get_by_email_or_username(
-        cls, username: str = None, email: str = None
+        cls, username: str = "", email: str = ""
     ) -> Union["UserModel", None]:
 
         query_pointer = cls.session.query(UserModel)
+        by_username = query_pointer.filter(UserModel.username.like(username)).first()
+        by_email = query_pointer.filter(UserModel.email.like(email)).first()
 
-        if username != None and len(username) != 0:
-            return query_pointer.filter(UserModel.username.like(username)).first()
-        if email != None and len(email) != 0:
-            return query_pointer.filter(UserModel.email.like(email)).first()
+        if bool(by_username) == True:
+            return by_username
+        if bool(by_email) == True:
+            return by_email
+
         return None
 
     @classmethod

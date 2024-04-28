@@ -1,9 +1,12 @@
 """_summary_
 """
 
+from http import HTTPStatus
+
 from flask_smorest import abort, Blueprint
 from flask.views import MethodView
-from http import HTTPStatus
+from flask_jwt_extended import jwt_required
+
 from app.final_project_api.model.business import (
     BusinessImageData,
     BusinessImageModel,
@@ -12,7 +15,7 @@ from app.final_project_api.model.business import (
     BusinessModel,
 )
 from app.jwt_service import getCurrentAuthId
-from flask_jwt_extended import jwt_required
+
 from .business_schemas import (
     BusinessModelSchema,
     QueryBusinessSchema,
