@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 
 
 @dataclass
-class ImageData:
+class ImagesPayloadData:
     image: FileStorage
 
 
@@ -31,4 +31,4 @@ class ImageSchema(Schema):
 
     @post_load
     def get_data(self, data, **kwargs):
-        return ImageData(**data)
+        return ImagesPayloadData(**data)

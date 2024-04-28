@@ -4,10 +4,11 @@
 from app.final_project_api.views.user.user_schemas import LoginSchemas, AuthData
 from unittest import TestCase
 from pprint import pprint
+from unittest import skip
 
 
 class TestLoginSchema(TestCase):
-
+    # @skip("just skip")
     def test_create_login_schema_one(self):
         login_schema = LoginSchemas()
         username_test = "some user name"

@@ -5,6 +5,7 @@ from tests.mock_database_connection import MockDatabaseConnection
 from .mock_model import MockModelBase
 from .mock_data import MockData
 from pprint import pprint
+from unittest import skip
 
 
 class TestModelBaseService(MockDatabaseConnection):
@@ -17,6 +18,7 @@ class TestModelBaseService(MockDatabaseConnection):
         super().teardown_class(self)
         MockModelBase.clean_all_model()
 
+    # @skip("just skip")
     def test_add_model_by_ModelBaseService(self):
         testing_mock = MockModelBase("hallo")
         MockModelBase.add_model(testing_mock)
@@ -28,6 +30,7 @@ class TestModelBaseService(MockDatabaseConnection):
 
         assert testing_mock == find_match_model
 
+    # @skip("just skip")
     def test_create_by_ModelBaseService(self):
         testing_name = "testing"
         MockModelBase.add_model(MockModelBase(name=testing_name))
@@ -40,6 +43,7 @@ class TestModelBaseService(MockDatabaseConnection):
         # pprint(data, indent=2)
         assert testing_model.name == testing_name
 
+    # @skip("just skip")
     def test_update_by_ModelBaseService(self):
         testing_first_name = "firstName"
         testing_second_name = "second name"
@@ -50,6 +54,7 @@ class TestModelBaseService(MockDatabaseConnection):
 
         assert first_models.id == second_models.id
 
+    # @skip("just skip")
     def test_delete_by_ModelBaseService(self):
         model_to_delete = "model to delete "
 
@@ -71,6 +76,7 @@ class TestModelBaseService(MockDatabaseConnection):
 
         assert testing_model == None
 
+    # @skip("just skip")
     def test_model_can_delete_all_model(self):
         """test_model_can_delete_all_model"""
         name_list = ["name one", "name two", "name three"]
@@ -84,12 +90,14 @@ class TestModelBaseService(MockDatabaseConnection):
         ).all()
         assert len(all_model) == 0
 
+    # @skip("just skip")
     def test_delete_model_by_id(self):
         prev_model_id = self.test_model.id
         MockModelBase.delete_model_with_id(model_id=prev_model_id)
         find_prev_model = MockModelBase.get_model_by_id(model_id=prev_model_id)
         assert find_prev_model == None
 
+    # @skip("just skip")
     def test_update_model_by_id(self):
         prev_model_id = self.test_model.id
         new_model_name = "new name"

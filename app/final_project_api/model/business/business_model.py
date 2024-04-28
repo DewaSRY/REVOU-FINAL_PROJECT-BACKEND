@@ -13,19 +13,16 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
     id = mapped_column("business_id", String(36), primary_key=True)
     user_id = mapped_column("user_id", String(36), ForeignKey("user.user_id"))
     business_name = mapped_column("name", String(50))
+    profile_url = mapped_column("profile_url", String(50))
 
     @property
     def business_images(self):
         from .business_image_model import BusinessImageModel
 
-        imagesList = (
-            self.session.query(BusinessImageModel)
-            .filter(BusinessImageModel.business_id == self.id)
-            .all()
-        )
+        imagesList = BusinessImageModel.get_image_by_business_id(self.id)
         if len(imagesList) == 0:
             return []
-        return [img.image_url for img in imagesList]
+        return [img.secure_url for img in imagesList]
 
     @property
     def product(self):

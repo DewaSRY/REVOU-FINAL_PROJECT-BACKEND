@@ -15,6 +15,7 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
     __tablename__ = "product"
     id = mapped_column("product_id", String(36), primary_key=True)
     product_name = mapped_column("product_name", String(50))
+    profile_url = mapped_column("profile_url", String(50))
     product_price = mapped_column("product_price", Float(10.2))
     create_at = mapped_column(
         "created_at", DateTime(timezone=True), server_default=func.now()
@@ -52,7 +53,7 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
         )
         if len(imageList) == 0:
             return []
-        return [img.image_url for img in imageList]
+        return [img.secure_url for img in imageList]
 
     def _set_user_id(self):
         from app.final_project_api.model.business import BusinessModel as BM

@@ -12,6 +12,7 @@ class UserData(DataBaseDefault):
     username: str
     password: str
     email: str
+    profile_url: str = field(default_factory=str)
     user_images: list[str] = field(init=False, default_factory=list)
     user_type_id: int = field(init=False)
     user_type: str = field(init=False)
@@ -24,7 +25,7 @@ class UserData(DataBaseDefault):
         self.email = email
         self._set_password(password)
         self.user_type_id = 1
-        # self.user_images = []
+        self.profile_url = ""
 
     def _set_password(self, password: str) -> None:
         self.password = pbkdf2_sha256.hash(password)

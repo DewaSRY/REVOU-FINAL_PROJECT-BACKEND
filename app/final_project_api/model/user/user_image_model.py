@@ -9,8 +9,8 @@ from app.model_base_service import db, ModelBaseService
 
 class UserImageModel(UserImageData, ModelBaseService["UserImageModel"], db.Model):
     __tablename__ = "user_image"
-    id = mapped_column("image_id", String(36), primary_key=True)
-    image_url = mapped_column("image_url", String(50))
+    public_id = mapped_column("public_id", String(36), primary_key=True)
+    secure_url = mapped_column("secure_url", String(50))
     user_id = mapped_column("user_id", String, ForeignKey("user.user_id"))
 
     def _get_all_model(self):
@@ -32,8 +32,19 @@ class UserImageModel(UserImageData, ModelBaseService["UserImageModel"], db.Model
         )
 
     @classmethod
-    def add_model(cls, image_url: str, user_id: str) -> "UserImageModel":
-        model = UserImageModel(image_url=image_url, user_id=user_id)
+    def add_model(
+        cls, secure_url: str, public_id: str, user_id: str
+    ) -> "UserImageModel":
+        from .user_model import UserModel
+
+        userModel: UserModel = UserModel.get_model_by_id(model_id=user_id)
+        if bool(userModel.profile_url) != True:
+            userModel.profile_url = secure_url
+
+        model = UserImageModel(
+            public_id=public_id, secure_url=secure_url, user_id=user_id
+        )
+
         cls.session.add(model)
         cls.session.commit()
         return model

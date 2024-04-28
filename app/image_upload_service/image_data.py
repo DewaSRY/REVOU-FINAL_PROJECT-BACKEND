@@ -7,15 +7,11 @@ from uuid import uuid4
 
 @dataclass
 class ImageData:
-    id: str = field(init=False)
-    image_url: str
-
-    def __init__(self, image_url: str):
-        self.id = str(uuid4())
-        self.image_url = image_url
+    secure_url: str = field(default_factory=lambda: "")
+    public_id: str = field(default_factory=lambda: str(uuid4()))
 
 
-@dataclass
-class ImageSaveData:
-    public_id: str
-    secure_url: str
+# @dataclass
+# class ImageSaveData:
+#     public_id: str
+#     secure_url: str

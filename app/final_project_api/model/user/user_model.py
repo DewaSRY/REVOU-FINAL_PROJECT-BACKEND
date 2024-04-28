@@ -24,6 +24,7 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     id = mapped_column("user_id", String(36), primary_key=True)
     username = mapped_column("username", String(50), unique=True, nullable=False)
     email = mapped_column("email", String(50), unique=True)
+    profile_url = mapped_column("profile_url", String(50), server_default="")
     password = mapped_column("password_hash", String(200))
     create_at = mapped_column(
         "created_at", DateTime(timezone=True), server_default=func.now()
@@ -65,7 +66,7 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
         if len(userImages) == 0:
             return []
 
-        return [img.image_url for img in userImages]
+        return [img.secure_url for img in userImages]
 
     def _get_model_by_id(self, model_id: str) -> Union["UserModel", None]:
         return self.session.query(UserModel).filter(UserModel.id == model_id).first()

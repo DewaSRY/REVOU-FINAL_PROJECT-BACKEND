@@ -5,8 +5,10 @@ from tests.mock_database_connection import MockDatabaseConnection
 
 from app.final_project_api.model.user import UserModel
 from app.final_project_api.model.business import BusinessModel, BusinessTypeModel
-from app.final_project_api.model.product import ProductModel
+from app.final_project_api.model.product import ProductModel, ProductImageModel
 from pprint import pprint
+from unittest import skip
+from uuid import uuid4
 
 
 class TestCreateProduct(MockDatabaseConnection):
@@ -33,11 +35,38 @@ class TestCreateProduct(MockDatabaseConnection):
         UserModel.clean_all_model()
         BusinessTypeModel.clean_all_model()
         BusinessModel.clean_all_model()
+        ProductImageModel.clean_all_model()
 
+    def test_create_product_image(self):
+        first_url = "first ulr"
+        second_url = "second ulr"
+        create_product = ProductModel.add_model(
+            business_id=self.business.id,
+            product_name=self.product_name,
+            product_price=self.product_price,
+        )
+        default_profile_url = create_product.profile_url
+        ProductImageModel.add_model(
+            public_id=str(uuid4()), secure_url=first_url, product_id=create_product.id
+        )
+        profile_url_after_first_image = create_product.profile_url
+        ProductImageModel.add_model(
+            public_id=str(uuid4()), secure_url=second_url, product_id=create_product.id
+        )
+        profile_url_after_second_image = create_product.profile_url
+        assert default_profile_url == ""
+        assert profile_url_after_first_image == first_url
+        assert profile_url_after_second_image == first_url
+        assert first_url in create_product.product_images
+        assert second_url in create_product.product_images
+
+    # @skip("just skip")
     def test_create_product(self):
         create_product = ProductModel.add_model(
             business_id=self.business.id,
             product_name=self.product_name,
             product_price=self.product_price,
         )
-        pprint(create_product, indent=2)
+        assert create_product.product_price == self.product_price
+        assert create_product.product_name == self.product_name
+        assert create_product.business_id == self.business.id

@@ -1,8 +1,8 @@
 # """_summary_
 # """
 
-from .image_data import ImageData, ImageSaveData
-from .image_schema import ImageSchema
+from .image_data import ImageData
+from .image_schema import ImageSchema, ImagesPayloadData
 from .cloudinary_service import CloudinaryService
 from .Image_service import ImageService
 

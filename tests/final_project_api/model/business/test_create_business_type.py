@@ -5,6 +5,7 @@ from tests.mock_database_connection import MockDatabaseConnection
 from app.final_project_api.model.business import BusinessTypeModel
 from app.data_store_service import DataStore
 from pprint import pprint
+from unittest import skip
 
 
 class TestCreateBusinessType(MockDatabaseConnection):
@@ -19,6 +20,7 @@ class TestCreateBusinessType(MockDatabaseConnection):
     def tearDown(self) -> None:
         BusinessTypeModel.clean_all_model()
 
+    # @skip("just skip")
     def test_create(self):
         type_create = BusinessTypeModel.add_model(name=self.type_name_one)
 
