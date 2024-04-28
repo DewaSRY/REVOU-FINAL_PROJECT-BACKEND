@@ -1,16 +1,33 @@
-# """_summary_
-# """
+"""_summary_
 
-# from dotenv import load_dotenv
-# import cloudinary
-# import os
+Returns:
+    _type_: _description_
+"""
+
+from cloudinary.uploader import upload
+from cloudinary.api import delete_resources
+
+from .image_data import ImageSaveData
+from werkzeug.datastructures import FileStorage
+from .image_service_able import ImageServiceAble
 
 
-# load_dotenv()
+class CloudinaryService(ImageServiceAble):
 
-# cloudinary_instance = cloudinary.config(
-#     cloud_name=os.getenv("CLOUD_NAME"),
-#     api_key=os.getenv("API_KEY"),
-#     api_secret=os.getenv("API_SECRET"),
-#     secure=True,
-# )
+    def save_image(self, image_data: FileStorage) -> ImageSaveData:
+        uploaded_file = upload(
+            unique_filename=False,
+            file=image_data,
+            folder="final_project",
+            public_id="",
+        )
+        return ImageSaveData(
+            public_id=uploaded_file["public_id"], secure_url=uploaded_file["secure_url"]
+        )
+
+    def delete_image(self, public_id: str):
+        public_ids = [public_id]
+        image_delete_result = delete_resources(
+            public_ids, resource_type="image", type="upload"
+        )
+        print(image_delete_result)

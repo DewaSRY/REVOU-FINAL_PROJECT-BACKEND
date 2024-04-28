@@ -13,7 +13,8 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS, cross_origin
 
-from .views import UserBluePrint, BusinessBluePrint, ProductBluePrint, ImageBluePrint
+
+from .views import UserBluePrint, BusinessBluePrint, ProductBluePrint
 from .model.user import UserTypeModel
 from .model.business import BusinessTypeModel
 
@@ -21,13 +22,11 @@ from app.model_base_service import db
 from app.jwt_service import JWTData
 from app.message_service import MassageService
 
-from .config_default import ConfigDefault
-
 
 def create_app():
     app = Flask(__name__, static_url_path="/", static_folder="../../templates")
     load_dotenv(".env")
-    app.config.from_object(ConfigDefault)
+    app.config.from_object("config_default")
     app.config.from_envvar("APPLICATION_SETTINGS", silent=True)
 
     jwt = JWTManager(app)
@@ -73,7 +72,6 @@ def create_app():
     api.register_blueprint(UserBluePrint)
     api.register_blueprint(BusinessBluePrint)
     api.register_blueprint(ProductBluePrint)
-    api.register_blueprint(ImageBluePrint)
 
     @app.route("/")
     def index():

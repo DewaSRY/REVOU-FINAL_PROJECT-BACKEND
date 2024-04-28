@@ -7,8 +7,6 @@ from pprint import pprint
 
 
 class TestUserViews(MockFlask):
-    def test_first(self):
-        assert 1 == 1
 
     def test_user_register(self):
         """

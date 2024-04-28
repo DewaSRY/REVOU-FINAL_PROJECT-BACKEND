@@ -86,10 +86,13 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     def get_by_email_or_username(
         cls, username: str = None, email: str = None
     ) -> Union["UserModel", None]:
+
+        query_pointer = cls.session.query(UserModel)
+
         if username != None and len(username) != 0:
-            cls.session.query(UserModel).filter(UserModel.username == username).first()
+            return query_pointer.filter(UserModel.username.like(username)).first()
         if email != None and len(email) != 0:
-            cls.session.query(UserModel).filter(UserModel.email == email).first()
+            return query_pointer.filter(UserModel.email.like(email)).first()
         return None
 
     @classmethod

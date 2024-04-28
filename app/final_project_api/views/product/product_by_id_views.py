@@ -14,15 +14,14 @@ from app.final_project_api.model.product import (
     ProductImageModel,
     ProductModel,
 )
-from ...schema.product import (
-    ProductSchema,
+
+
+from .product_schemas import (
     ProductModelSchema,
-    ProductCreateData,
-    ProductCreateSchema,
 )
 
 
-@blp.route("/product/<string:product_id>")
+@blp.route("/<string:product_id>")
 class ProductByIdViews(MethodView):
 
     @blp.response(schema=ProductModelSchema, status_code=HTTPStatus.OK)

@@ -64,6 +64,7 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
         return self.session.query(ProductModel).all()
 
     def _get_model_by_id(self, model_id: str) -> "ProductModel":
+        print(model_id)
         return (
             self.session.query(ProductModel).filter(ProductModel.id == model_id).first()
         )

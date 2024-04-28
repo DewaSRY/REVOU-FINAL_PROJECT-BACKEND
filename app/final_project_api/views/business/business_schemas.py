@@ -2,7 +2,7 @@
 """
 
 from marshmallow import Schema, fields, post_load
-from app.final_project_api.schema.product.product_schemas import ProductSchema
+from app.final_project_api.views.product.product_schemas import ProductSchema
 from .business_data import QueryBusinessData, BusinessCreateData
 
 

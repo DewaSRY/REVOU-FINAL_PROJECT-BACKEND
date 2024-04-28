@@ -14,15 +14,17 @@ from app.final_project_api.model.business import (
 )
 from app.jwt_service import getCurrentAuthId
 from flask_jwt_extended import jwt_required
-from ...schema.business import (
+from .business_schemas import (
     BusinessModelSchema,
-    BusinessCreateData,
     BusinessCreateSchema,
     BusinessSchemas,
 )
+from .business_data import (
+    BusinessCreateData,
+)
 
 
-@blp.route("/business/<string:business_id>")
+@blp.route("/<string:business_id>")
 class BusinessByIdViews(MethodView):
 
     @blp.response(schema=BusinessModelSchema, status_code=HTTPStatus.OK)

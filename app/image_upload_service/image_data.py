@@ -13,3 +13,9 @@ class ImageData:
     def __init__(self, image_url: str):
         self.id = str(uuid4())
         self.image_url = image_url
+
+
+@dataclass
+class ImageSaveData:
+    public_id: str
+    secure_url: str

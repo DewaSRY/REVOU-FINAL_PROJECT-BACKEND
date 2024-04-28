@@ -6,23 +6,28 @@ Returns:
 
 from flask_smorest import abort
 from flask.views import MethodView
-from .user_blp import blp
+from flask_jwt_extended import jwt_required
+
 from http import HTTPStatus
 from datetime import timedelta
+
+from app.jwt_service import createAccessToken, getCurrentAuthId
 from app.final_project_api.model.user import (
     UserModel,
 )
-from ...schema.user import (
-    RegisterSchema,
+from .user_blp import blp
+
+from .user_data import (
     AuthData,
     AuthResponseData,
+)
+from .user_schemas import (
+    LoginSchemas,
     UserModelSchema,
 )
-from app.jwt_service import createAccessToken, getCurrentAuthId
-from flask_jwt_extended import jwt_required
 
 
-@blp.route("/user/sign-in")
+@blp.route("/sign-in")
 class UserSignInView(MethodView):
 
     @jwt_required()

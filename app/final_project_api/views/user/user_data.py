@@ -1,3 +1,6 @@
+"""_summary_
+"""
+
 from dataclasses import dataclass, field
 from app.final_project_api.model.business import BusinessDate
 from app.final_project_api.model.product import ProductData

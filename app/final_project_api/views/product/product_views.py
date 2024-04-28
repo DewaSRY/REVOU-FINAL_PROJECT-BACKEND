@@ -7,24 +7,27 @@ from http import HTTPStatus
 from flask_jwt_extended import jwt_required
 
 
-from .product_blp import blp
 from app.final_project_api.model.product import (
     ProductData,
     ProductImageData,
     ProductImageModel,
     ProductModel,
 )
+from .product_blp import blp
 
-from ...schema.product import (
+from .product_schemas import (
     ProductSchema,
     ProductModelSchema,
     ProductPublicSchemas,
-    ProductCreateData,
     ProductCreateSchema,
 )
 
+from .product_data import (
+    ProductCreateData,
+)
 
-@blp.route("/product")
+
+@blp.route("/")
 class ProductViews(MethodView):
 
     @blp.response(schema=ProductPublicSchemas(many=True), status_code=HTTPStatus.OK)

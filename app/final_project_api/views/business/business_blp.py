@@ -6,7 +6,8 @@ from flask_smorest import Blueprint, abort
 blp = Blueprint(
     "business",
     __name__,
+    url_prefix="/business",
     description="""
-                user management end point
+                business management end point
                 """,
 )

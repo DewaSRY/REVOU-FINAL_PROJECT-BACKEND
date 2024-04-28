@@ -6,23 +6,23 @@ Returns:
 
 from flask_smorest import abort
 from flask.views import MethodView
-from .user_blp import blp
 from http import HTTPStatus
+
 from app.final_project_api.model.user import (
     UserModel,
 )
 
-from ...schema.user import (
-    RegisterSchema,
+from .user_blp import blp
+from .user_data import (
     AuthData,
     AuthResponseData,
-    UserModelSchema,
 )
+from .user_schemas import UserModelSchema, RegisterSchema
 
 from app.jwt_service import createAccessToken
 
 
-@blp.route("/user/register")
+@blp.route("/register")
 class UserRegisterView(MethodView):
     @blp.arguments(schema=RegisterSchema)
     @blp.response(status_code=HTTPStatus.CREATED, schema=UserModelSchema)

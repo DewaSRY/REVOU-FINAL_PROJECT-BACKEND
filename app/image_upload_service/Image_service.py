@@ -1,75 +1,32 @@
-# import os
-# import re
-# from typing import Union
-# from werkzeug.datastructures import FileStorage
+"""_summary_
 
-# from flask_uploads import UploadSet, IMAGES
+Returns:
+    _type_: _description_
+"""
 
-# IMAGE_SET = UploadSet("images", IMAGES)  # set name and allowed extensions
+from werkzeug.datastructures import FileStorage
 
+from .image_service_able import ImageServiceAble
 
-# def save_image(image: FileStorage, folder: str = None, name: str = None) -> str:
-#     return IMAGE_SET.save(image, folder, name)
-
-
-# def get_path(filename: str = None, folder: str = None) -> str:
-#     return IMAGE_SET.path(filename, folder)
+from .cloudinary_service import CloudinaryService
+from os import path
 
 
-# def find_image_any_format(filename: str, folder: str) -> Union[str, None]:
-#     """
-#     Given a format-less filename, try to find the file by appending each of the allowed formats to the given
-#     filename and check if the file exists
-#     :param filename: formatless filename
-#     :param folder: the relative folder in which to search
-#     :return: the path of the image if exists, otherwise None
-#     """
-#     for _format in IMAGES:  # look for existing avatar and delete it
-#         avatar = f"{filename}.{_format}"
-#         avatar_path = IMAGE_SET.path(filename=avatar, folder=folder)
-#         if os.path.isfile(avatar_path):
-#             return avatar_path
-#     return None
+class ImageService:
 
+    image_service: ImageServiceAble = CloudinaryService()
 
-# def _retrieve_filename(file: Union[str, FileStorage]) -> str:
-#     """
-#     Make our filename related functions generic, able to deal with FileStorage object as well as filename str.
-#     """
-#     if isinstance(file, FileStorage):
-#         return file.filename
-#     return file
+    image_extension = [".jpeg", ".png", ".gif", ".jpg"]
 
+    @classmethod
+    def image_save(cls, image_data: FileStorage):
+        return cls.image_service.save_image(image_data=image_data)
 
-# def is_filename_safe(file: Union[str, FileStorage]) -> bool:
-#     """
-#     Check if a filename is secure according to our definition
-#     - starts with a-z A-Z 0-9 at least one time
-#     - only contains a-z A-Z 0-9 and _().-
-#     - followed by a dot (.) and a allowed_format at the end
-#     """
-#     filename = _retrieve_filename(file)
+    @classmethod
+    def image_delete(cls, public_id: str):
+        return cls.image_service.delete_image(public_id=public_id)
 
-#     allowed_format = "|".join(IMAGES)
-#     # format IMAGES into regex, eg: ('jpeg','png') --> 'jpeg|png'
-#     # regex = f"^[a-zA-Z0-9][a-zA-Z0-9_()-\.]*\.({allowed_format})$"
-#     regex = ""
-#     return re.match(regex, filename) is not None
-
-
-# def get_basename(file: Union[str, FileStorage]) -> str:
-#     """
-#     Return file's basename, for example
-#     get_basename('some/folder/image.jpg') returns 'image.jpg'
-#     """
-#     filename = _retrieve_filename(file)
-#     return os.path.split(filename)[1]
-
-
-# def get_extension(file: Union[str, FileStorage]) -> str:
-#     """
-#     Return file's extension, for example
-#     get_extension('image.jpg') returns '.jpg'
-#     """
-#     filename = _retrieve_filename(file)
-#     return os.path.splitext(filename)[1]
+    @classmethod
+    def check_extension(cls, image_data: FileStorage) -> bool:
+        extension = path.splitext(image_data.filename)
+        return extension[1] in cls.image_extension
