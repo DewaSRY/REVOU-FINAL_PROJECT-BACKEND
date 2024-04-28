@@ -1,7 +1,7 @@
 """_summary_
 """
 
-from flask_smorest import abort
+from flask_smorest import abort, Blueprint
 from flask.views import MethodView
 from http import HTTPStatus
 from flask_jwt_extended import jwt_required
@@ -13,7 +13,6 @@ from app.final_project_api.model.product import (
     ProductImageModel,
     ProductModel,
 )
-from .product_blp import blp
 
 from .product_schemas import (
     ProductSchema,
@@ -24,6 +23,15 @@ from .product_schemas import (
 
 from .product_data import (
     ProductCreateData,
+)
+
+blp = Blueprint(
+    "product",
+    __name__,
+    url_prefix="/product",
+    description="""
+                user management end point
+                """,
 )
 
 
@@ -46,3 +54,11 @@ class ProductViews(MethodView):
             )
         except Exception as e:
             abort(http_status_code=HTTPStatus.CONFLICT, message=str(e))
+
+
+@blp.route("/<string:product_id>")
+class ProductByIdViews(MethodView):
+
+    @blp.response(schema=ProductModelSchema, status_code=HTTPStatus.OK)
+    def get(self, product_id: id):
+        return ProductModel.get_model_by_id(model_id=product_id)

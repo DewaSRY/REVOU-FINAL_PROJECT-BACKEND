@@ -44,13 +44,9 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
 
     @property
     def product_images(self):
-        from .product_image_model import ProductImageModel
+        from .product_image_model import ProductImageModel as PM
 
-        imageList: list[ProductImageModel] = (
-            self.session.query(ProductImageModel)
-            .filter(ProductImageModel.product_id == self.id)
-            .all()
-        )
+        imageList: list[PM] = PM.get_image_by_product_id(product_id=self.id)
         if len(imageList) == 0:
             return []
         return [img.secure_url for img in imageList]
@@ -65,7 +61,6 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
         return self.session.query(ProductModel).all()
 
     def _get_model_by_id(self, model_id: str) -> "ProductModel":
-        print(model_id)
         return (
             self.session.query(ProductModel).filter(ProductModel.id == model_id).first()
         )

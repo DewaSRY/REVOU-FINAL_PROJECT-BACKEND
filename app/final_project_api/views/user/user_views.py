@@ -1,0 +1,116 @@
+"""_summary_
+"""
+
+from flask_smorest import abort, Blueprint
+from flask.views import MethodView
+from http import HTTPStatus
+
+from flask_smorest.fields import Upload
+from cloudinary.utils import cloudinary_url
+from flask_jwt_extended import jwt_required
+
+from app.final_project_api.model.user import (
+    UserModel,
+)
+from app.jwt_service import createAccessToken, getCurrentAuthId
+
+from .user_data import (
+    AuthData,
+    AuthResponseData,
+)
+from .user_schemas import LoginSchemas, UserModelSchema, RegisterSchema
+from app.image_upload_service import (
+    ImageService,
+    ImageSchema,
+    ImageData,
+    ImagesPayloadData,
+)
+
+blp = Blueprint(
+    "users",
+    __name__,
+    url_prefix="/user",
+    description="""
+                user management end point
+                """,
+)
+
+
+@blp.route("/login")
+class UserLoginViews(MethodView):
+
+    @blp.arguments(schema=LoginSchemas)
+    @blp.response(schema=UserModelSchema, status_code=HTTPStatus.OK)
+    @blp.alt_response(
+        status_code=HTTPStatus.FORBIDDEN,
+        description="user not found",
+    )
+    def post(self, user_data: AuthData):
+
+        user: UserModel = UserModel.get_by_email_or_username(
+            username=user_data.username, email=user_data.email
+        )
+        if user and user.match_password(receive_password=user_data.password):
+
+            access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
+            return AuthResponseData(user_model=user, access_token=access_token)
+
+        abort(http_status_code=HTTPStatus.FORBIDDEN, message="Invalid credentials")
+
+
+@blp.route("/register")
+class UserRegisterView(MethodView):
+    @blp.arguments(schema=RegisterSchema)
+    @blp.response(status_code=HTTPStatus.CREATED, schema=UserModelSchema)
+    @blp.alt_response(
+        status_code=HTTPStatus.CONFLICT,
+        description="duplicate username",
+    )
+    def post(self, item_data: AuthData):
+
+        try:
+            user = UserModel.add_model(
+                email=item_data.email,
+                username=item_data.username,
+                password=item_data.password,
+            )
+            access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
+            return AuthResponseData(user_model=user, access_token=access_token)
+        except Exception as E:
+            abort(
+                http_status_code=HTTPStatus.CONFLICT,
+                message=str(E),
+            )
+
+
+@blp.route("/sign-in")
+class UserSignInView(MethodView):
+
+    @jwt_required()
+    @blp.response(status_code=HTTPStatus.CREATED, schema=UserModelSchema)
+    @blp.alt_response(
+        status_code=HTTPStatus.CONFLICT,
+        description="duplicate username",
+    )
+    def get(self):
+        try:
+            user = UserModel.get_model_by_id(model_id=getCurrentAuthId())
+            access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
+            return AuthResponseData(user_model=user, access_token=access_token)
+        except Exception as E:
+            abort(
+                http_status_code=HTTPStatus.CONFLICT,
+                message=str(E),
+            )
+
+
+@blp.route("/image")
+class ImageUserViews(MethodView):
+    @blp.arguments(schema=ImageSchema, location="files")
+    def post(self, data: ImagesPayloadData):
+        image_data: Upload = data.image
+        if ImageService.check_extension(image_data=image_data):
+            response_data: ImageData = ImageService.image_save(image_data=image_data)
+            # pprint(response_data.secure_url, indent=2)
+
+            return {"message": response_data.secure_url}

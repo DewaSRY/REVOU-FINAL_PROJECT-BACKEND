@@ -1,8 +1,7 @@
 """_summary_
 """
 
-from .business_blp import blp
-from flask_smorest import abort
+from flask_smorest import abort, Blueprint
 from flask.views import MethodView
 from http import HTTPStatus
 from app.final_project_api.model.business import (
@@ -23,6 +22,15 @@ from .business_schemas import (
 from .business_data import (
     QueryBusinessData,
     BusinessCreateData,
+)
+
+blp = Blueprint(
+    "business",
+    __name__,
+    url_prefix="/business",
+    description="""
+                business management end point
+                """,
 )
 
 
@@ -47,3 +55,14 @@ class BusinessViews(MethodView):
             return model
         except Exception as e:
             abort(http_status_code=HTTPStatus.CONFLICT, message=str(e))
+
+
+@blp.route("/<string:business_id>")
+class BusinessByIdViews(MethodView):
+
+    @blp.response(schema=BusinessModelSchema, status_code=HTTPStatus.OK)
+    def get(self, business_id: str):
+        model = BusinessModel.get_model_by_id(model_id=business_id)
+        if model == None:
+            abort(http_status_code=HTTPStatus.NOT_FOUND, message="business not found")
+        return model

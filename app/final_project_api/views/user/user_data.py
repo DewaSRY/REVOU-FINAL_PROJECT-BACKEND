@@ -22,6 +22,7 @@ class AuthResponseData:
     update_at: datetime
     access_token: str
     user_type: str
+    profile_url: str
     images: list[str]
     username: str = field(default_factory=str)
     email: str = field(default_factory=str)
@@ -39,3 +40,4 @@ class AuthResponseData:
         self.images = user_model.user_images
         self.business = user_model.business
         self.product = user_model.product
+        self.profile_url = user_model.profile_url

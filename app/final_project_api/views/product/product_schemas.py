@@ -9,6 +9,7 @@ class ProductSchema(Schema):
     product_name = fields.Str()
     product_price = fields.Float()
     product_images = fields.List(fields.Str())
+    profile_url = fields.Str()
     id = fields.Str()
 
 

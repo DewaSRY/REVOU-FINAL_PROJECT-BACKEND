@@ -28,10 +28,10 @@ class ProductImageModel(
         )
 
     @classmethod
-    def get_image_by_business_id(cls, business_id: str) -> list["ProductImageModel"]:
+    def get_image_by_product_id(cls, product_id: str) -> list["ProductImageModel"]:
         return (
             cls.session.query(ProductImageModel)
-            .filter(ProductImageModel.business_id == business_id)
+            .filter(ProductImageModel.product_id == product_id)
             .all()
         )
 

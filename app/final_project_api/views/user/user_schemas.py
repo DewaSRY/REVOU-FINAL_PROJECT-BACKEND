@@ -42,6 +42,7 @@ class UserModelSchema(RegisterSchema):
     email = fields.Email()
     username = fields.Str()
     user_type = fields.Str()
+    profile_url = fields.Str()
     images = fields.List(fields.Str)
 
     business = fields.List(fields.Nested(BusinessSchemas), dump_only=True)
