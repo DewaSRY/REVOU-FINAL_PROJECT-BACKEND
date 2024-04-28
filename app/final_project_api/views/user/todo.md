@@ -5,4 +5,5 @@
 - [x] as a user, i can sign - in
 
 - [x] as a user, i can create image
-- [] as a user, i can fill in my data
+- [x] as a user, i can fill in my data
+- [x] as a user, i can send image as profile and asset

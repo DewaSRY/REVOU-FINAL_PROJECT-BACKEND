@@ -15,3 +15,5 @@
 - [x] make minim requirement, with sqlLit
 - [x] create business view
 - [x] create product view
+
+- []

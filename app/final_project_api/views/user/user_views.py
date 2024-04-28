@@ -9,9 +9,7 @@ from flask.views import MethodView
 from flask_smorest.fields import Upload
 from flask_jwt_extended import jwt_required
 
-from app.final_project_api.model.user import (
-    UserModel,
-)
+from app.final_project_api.model.user import UserModel, UserImageModel
 from app.jwt_service import createAccessToken, getCurrentAuthId
 from app.image_upload_service import (
     ImageService,
@@ -137,10 +135,17 @@ class UserSignInView(MethodView):
 
 @blp.route("/image")
 class ImageUserViews(MethodView):
+    @jwt_required()
     @blp.arguments(schema=ImageSchema, location="files")
+    @blp.response(status_code=HTTPStatus.CREATED, schema=UserModelSchema)
     def post(self, data: ImagesPayloadData):
         image_data: Upload = data.image
         if ImageService.check_extension(image_data=image_data):
             response_data: ImageData = ImageService.image_save(image_data=image_data)
+            UserImageModel.add_model(
+                public_id=response_data.public_id,
+                secure_url=response_data.secure_url,
+                user_id=getCurrentAuthId(),
+            )
 
-            return {"message": response_data.secure_url}
+            return UserModel.get_model_by_id(model_id=getCurrentAuthId())
