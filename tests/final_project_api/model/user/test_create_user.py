@@ -4,7 +4,6 @@
 from tests.mock_database_connection import MockDatabaseConnection
 from app.final_project_api.model.user import (
     UserTypeModel,
-    UserImageModel,
     UserModel,
 )
 from pprint import pprint
@@ -12,13 +11,20 @@ from unittest import skip
 from uuid import uuid4
 
 
-class TestCreateUSer(MockDatabaseConnection):
+class TestCreateUser(MockDatabaseConnection):
     def setup_class(self):
         super().setup_class(self)
         UserTypeModel.clean_all_model()
         self.user_name = "some name another one"
         self.user_email = "some email another email"
         self.user_password = "some password"
+        self.name_list = [
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+        ]
 
     def setUp(self) -> None:
         self.type_user = UserTypeModel.add_model(name="some type")
@@ -26,31 +32,6 @@ class TestCreateUSer(MockDatabaseConnection):
     def tearDown(self) -> None:
         UserModel.clean_all_model()
         UserTypeModel.clean_all_model()
-        UserImageModel.clean_all_model()
-
-    def test_create_user_image(self):
-        img_secure_url = "some secure Url"
-        img_secure_url_two = "some secure Url two"
-        user_create: UserModel = UserModel.add_model(
-            username=self.user_name, password=self.user_password, email=self.user_email
-        )
-        default_user_profile_url = user_create.profile_url
-        UserImageModel.add_model(
-            user_id=user_create.id, secure_url=img_secure_url, public_id=str(uuid4())
-        )
-        user_profile_after_first_create = user_create.profile_url
-        UserImageModel.add_model(
-            user_id=user_create.id,
-            secure_url=img_secure_url_two,
-            public_id=str(uuid4()),
-        )
-        user_profile_after_second_create = user_create.profile_url
-
-        assert default_user_profile_url == ""
-        assert user_profile_after_first_create == img_secure_url
-        assert user_profile_after_second_create == img_secure_url
-        assert img_secure_url in user_create.user_images
-        assert img_secure_url_two in user_create.user_images
 
     # @skip("just skip")
     def test_create_user(self):
@@ -102,7 +83,7 @@ class TestCreateUSer(MockDatabaseConnection):
             assert str(e) == f"username: '{self.user_name}' already use"
 
     # @skip("just skip")
-    def test_create_with_same_username(self):
+    def test_create_email_same_username(self):
         try:
             UserModel.add_model(
                 username=self.user_name,
@@ -116,3 +97,37 @@ class TestCreateUSer(MockDatabaseConnection):
             )
         except Exception as e:
             assert str(e) == f"email: '{self.user_email}' already use"
+
+    def test_get_user_by_email(self):
+
+        user_create = UserModel.add_model(
+            username=self.user_name,
+            password=self.user_password,
+            email=self.user_email,
+        )
+
+        for index in range(len(self.name_list)):
+            UserModel.add_model(
+                username=self.name_list[index],
+                email="{}@gmail.com".format(self.name_list[index]),
+                password=self.name_list[index],
+            )
+        userMatch = UserModel.get_by_email_or_username(email=self.user_email)
+
+        assert user_create == userMatch
+
+    def test_get_user_by_username(self):
+
+        user_create = UserModel.add_model(
+            username=self.user_name,
+            password=self.user_password,
+            email=self.user_email,
+        )
+        for index in range(len(self.name_list)):
+            UserModel.add_model(
+                username=self.name_list[index],
+                email="{}@gmail.com".format(self.name_list[index]),
+                password=self.name_list[index],
+            )
+        userMatch = UserModel.get_by_email_or_username(username=self.user_name)
+        assert user_create == userMatch

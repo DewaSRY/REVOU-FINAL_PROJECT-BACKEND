@@ -20,7 +20,7 @@ from .model.business import BusinessTypeModel
 
 from app.model_base_service import db
 from app.jwt_service import JWTData
-from app.message_service import MassageService
+from app.message_service import MessageService
 
 
 def create_app():
@@ -42,21 +42,21 @@ def create_app():
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
         return (
-            jsonify(MassageService.get_message(key_name="expired_token_callback")),
+            jsonify(MessageService.get_message(key_name="expired_token_callback")),
             HTTPStatus.UNAUTHORIZED,
         )
 
     @jwt.invalid_token_loader
     def invalid_token_callback(error):
         return (
-            jsonify(MassageService.get_message(key_name="invalid_token_callback")),
+            jsonify(MessageService.get_message(key_name="invalid_token_callback")),
             HTTPStatus.UNAUTHORIZED,
         )
 
     @jwt.unauthorized_loader
     def missing_token_callback(error):
         return (
-            jsonify(MassageService.get_message(key_name="missing_token")),
+            jsonify(MessageService.get_message(key_name="missing_token")),
             HTTPStatus.UNAUTHORIZED,
         )
 

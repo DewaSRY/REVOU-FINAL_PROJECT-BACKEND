@@ -27,20 +27,20 @@ class TestModelBaseService(MockDatabaseConnection):
             .filter(MockModelBase.id == testing_mock.id)
             .first()
         )
-
         assert testing_mock == find_match_model
 
     # @skip("just skip")
     def test_create_by_ModelBaseService(self):
         testing_name = "testing"
         MockModelBase.add_model(MockModelBase(name=testing_name))
-        testing_model = (
+        testing_model: MockModelBase = (
             MockModelBase.session.query(MockModelBase)
             .filter(MockModelBase.name == testing_name)
             .first()
         )
         # data = MockData(name="some name", username="some user name")
-        # pprint(data, indent=2)
+        # pprint( indent=2)
+
         assert testing_model.name == testing_name
 
     # @skip("just skip")

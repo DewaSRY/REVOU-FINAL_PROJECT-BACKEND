@@ -5,7 +5,34 @@ from marshmallow import Schema, fields, post_load
 from app.final_project_api.views.business.business_schemas import BusinessSchemas
 from app.final_project_api.views.product.product_schemas import ProductSchema
 
-from .user_data import AuthData, UserUpdateData
+from app.final_project_api.model.user import AuthData, UserUpdateData
+
+
+class ImageModelSchema(Schema):
+    id = fields.Str()
+    public_id = fields.Str()
+    secure_url = fields.Str()
+    user_id = fields.Str()
+    create_at = fields.DateTime()
+
+
+class UserImageModelSchema(ImageModelSchema):
+    username = fields.String()
+
+
+# class QueryUpdateProfile(Schema):
+#     pubic_id = fields.Str()
+
+
+class UserWithImagesSchema(Schema):
+    id = fields.Str()
+    create_at = fields.DateTime()
+    update_at = fields.DateTime()
+    username = fields.String()
+    email = fields.Email()
+    user_type = fields.Str()
+    profile_url = fields.Str()
+    images = fields.List(fields.Nested(ImageModelSchema))
 
 
 class LoginSchemas(Schema):
@@ -44,25 +71,27 @@ class UserUpdateSchema(Schema):
         return UserUpdateData(**data)
 
 
-class UserModelSchema(RegisterSchema):
+class UserModelSchema(UserUpdateSchema):
     """schemas to response user schemas"""
 
-    user_id = fields.Str()
+    id = fields.Str()
     create_at = fields.DateTime()
     update_at = fields.DateTime()
-    access_token = fields.Str()
 
-    phone_number = fields.Str()
-    address = fields.Str()
-    occupation = fields.Str()
-    description = fields.Str()
-
-    email = fields.Email()
-    username = fields.Str()
     user_type = fields.Str()
     profile_url = fields.Str()
-    images = fields.List(fields.Str)
+    images = fields.List(fields.Nested(ImageModelSchema))
+
     product_amount = fields.Integer()
     business_amount = fields.Integer()
     business = fields.List(fields.Nested(BusinessSchemas), dump_only=True)
     product = fields.List(fields.Nested(ProductSchema), dump_only=True)
+
+
+class UserAuthSchema(UserModelSchema):
+    access_token = fields.Str()
+    user_id = fields.Str()
+
+
+class UserImageModelSchema(ImageModelSchema):
+    username = fields.Str()

@@ -9,8 +9,15 @@ from flask.views import MethodView
 from flask_smorest.fields import Upload
 from flask_jwt_extended import jwt_required
 
-from app.final_project_api.model.user import UserModel, UserImageModel
+from app.final_project_api.model.user import (
+    UserModel,
+    UserImageModel,
+    AuthData,
+    UserUpdateData,
+    AuthResponseData,
+)
 from app.jwt_service import createAccessToken, getCurrentAuthId
+from app.message_service import MessageService
 from app.image_upload_service import (
     ImageService,
     ImageSchema,
@@ -23,8 +30,10 @@ from .user_schemas import (
     UserModelSchema,
     RegisterSchema,
     UserUpdateSchema,
+    UserAuthSchema,
+    UserImageModelSchema,
+    UserWithImagesSchema,
 )
-from .user_data import AuthData, AuthResponseData, UserUpdateData
 
 blp = Blueprint(
     "users",
@@ -41,111 +50,252 @@ class UserViews(MethodView):
     @jwt_required()
     @blp.arguments(schema=UserUpdateSchema)
     @blp.response(schema=UserModelSchema, status_code=HTTPStatus.CREATED)
+    @blp.alt_response(
+        status_code=HTTPStatus.CONFLICT,
+        description=MessageService.get_message("duplicate-error").format(
+            "data from payload"
+        ),
+    )
+    @blp.alt_response(
+        status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        description=MessageService.get_message("failed_update").format(
+            "from jwt token"
+        ),
+    )
     def put(self, user_data: UserUpdateData):
 
         duplicateUse: UserModel = UserModel.get_by_email_or_username(
             username=user_data.username, email=user_data.email
         )
-        if bool(duplicateUse) == True and duplicateUse.id != getCurrentAuthId():
-            abort(
-                http_status_code=HTTPStatus.CONFLICT,
-                message="user name or email already use ",
-            )
 
-        userModel = UserModel.update_with_id(
-            user_id=getCurrentAuthId(),
-            username=user_data.username,
-            address=user_data.address,
-            description=user_data.description,
-            email=user_data.email,
-            phone_number=user_data.phone_number,
-            occupation=user_data.occupation,
-        )
-        return userModel
+        if bool(duplicateUse) == True and duplicateUse.id != getCurrentAuthId():
+            duplicate_data: str = (
+                user_data.username
+                if duplicateUse.username == user_data.username
+                else user_data.email
+            )
+            message = MessageService.get_message("duplicate-error").format(
+                duplicate_data
+            )
+            abort(http_status_code=HTTPStatus.CONFLICT, message=message)
+        try:
+            userModel = UserModel.update_with_update_data(
+                user_id=getCurrentAuthId(), update_data=user_data
+            )
+            return userModel
+        except Exception as e:
+            abort(
+                http_status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                message=MessageService.get_message("failed_update").format(
+                    getCurrentAuthId()
+                ),
+            )
 
 
 @blp.route("/login")
 class UserLoginViews(MethodView):
 
     @blp.arguments(schema=LoginSchemas)
-    @blp.response(schema=UserModelSchema, status_code=HTTPStatus.OK)
+    @blp.response(schema=UserAuthSchema, status_code=HTTPStatus.OK)
     @blp.alt_response(
-        status_code=HTTPStatus.FORBIDDEN,
-        description="user not found",
+        status_code=HTTPStatus.NOT_FOUND,
+        description=MessageService.get_message("account-not-found").format(
+            "credential get send"
+        ),
     )
     def post(self, user_data: AuthData):
 
         user: UserModel = UserModel.get_by_email_or_username(
             username=user_data.username, email=user_data.email
         )
-        if user and user.match_password(receive_password=user_data.password):
+        if bool(user) != True:
+            abort(
+                http_status_code=HTTPStatus.NOT_FOUND,
+                message=MessageService.get_message("account-not-found").format(
+                    f"username: {user_data.username} "
+                    if len(user_data.username) != 0
+                    else f"email : {user_data.email}"
+                ),
+            )
 
-            access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
-            return AuthResponseData(user_model=user, access_token=access_token)
+        if user.match_password(receive_password=user_data.password) != True:
+            abort(
+                http_status_code=HTTPStatus.FORBIDDEN,
+                message=MessageService.get_message("password-not-match"),
+            )
 
-        abort(http_status_code=HTTPStatus.FORBIDDEN, message="Invalid credentials")
+        access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
+        return AuthResponseData(user_model=user, access_token=access_token)
 
 
 @blp.route("/register")
 class UserRegisterView(MethodView):
     @blp.arguments(schema=RegisterSchema)
-    @blp.response(status_code=HTTPStatus.CREATED, schema=UserModelSchema)
+    @blp.response(status_code=HTTPStatus.CREATED, schema=UserAuthSchema)
     @blp.alt_response(
         status_code=HTTPStatus.CONFLICT,
-        description="duplicate username",
+        description=MessageService.get_message("duplicate-error").format(
+            "data from payload"
+        ),
     )
-    def post(self, item_data: AuthData):
-
-        try:
-            user = UserModel.add_model(
-                email=item_data.email,
-                username=item_data.username,
-                password=item_data.password,
+    def post(self, user_data: AuthData):
+        userDuplicate: UserModel = UserModel.get_by_email_or_username(
+            username=user_data.username, email=user_data.email
+        )
+        if bool(userDuplicate):
+            duplicate_data: str = (
+                user_data.username
+                if userDuplicate.username == user_data.username
+                else user_data.email
             )
-            access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
-            return AuthResponseData(user_model=user, access_token=access_token)
-
-        except Exception as E:
-            abort(
-                http_status_code=HTTPStatus.CONFLICT,
-                message=str(E),
+            message = MessageService.get_message("duplicate-error").format(
+                duplicate_data
             )
+            abort(http_status_code=HTTPStatus.CONFLICT, message=message)
+
+        user = UserModel.add_model(
+            email=user_data.email,
+            username=user_data.username,
+            password=user_data.password,
+        )
+        access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
+        return AuthResponseData(user_model=user, access_token=access_token)
 
 
 @blp.route("/sign-in")
 class UserSignInView(MethodView):
 
     @jwt_required()
-    @blp.response(status_code=HTTPStatus.CREATED, schema=UserModelSchema)
+    @blp.response(status_code=HTTPStatus.OK, schema=UserModelSchema)
     @blp.alt_response(
         status_code=HTTPStatus.CONFLICT,
-        description="duplicate username",
+        description=MessageService.get_message("account-not-found").format(
+            "from jwt token"
+        ),
     )
     def get(self):
-        try:
-            user = UserModel.get_model_by_id(model_id=getCurrentAuthId())
-            access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
-            return AuthResponseData(user_model=user, access_token=access_token)
-        except Exception as E:
+        userModel = UserModel.get_model_by_id(model_id=getCurrentAuthId())
+        if bool(userModel) == False:
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
-                message=str(E),
+                message=MessageService.get_message("account-not-found").format(
+                    getCurrentAuthId()
+                ),
             )
+        return userModel
 
 
 @blp.route("/image")
 class ImageUserViews(MethodView):
+
     @jwt_required()
     @blp.arguments(schema=ImageSchema, location="files")
-    @blp.response(status_code=HTTPStatus.CREATED, schema=UserModelSchema)
+    @blp.response(status_code=HTTPStatus.CREATED, schema=UserImageModelSchema)
+    @blp.alt_response(
+        status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+        description=MessageService.get_message("file_not_image_type"),
+    )
     def post(self, data: ImagesPayloadData):
         image_data: Upload = data.image
-        if ImageService.check_extension(image_data=image_data):
-            response_data: ImageData = ImageService.image_save(image_data=image_data)
-            UserImageModel.add_model(
-                public_id=response_data.public_id,
-                secure_url=response_data.secure_url,
-                user_id=getCurrentAuthId(),
+        if ImageService.check_extension(image_data=image_data) != True:
+            abort(
+                http_status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                message=MessageService.get_message("file_not_image_type"),
             )
+        response_data: ImageData = ImageService.image_save(image_data=image_data)
+        userImageModel = UserImageModel.add_model(
+            public_id=response_data.public_id,
+            secure_url=response_data.secure_url,
+            user_id=getCurrentAuthId(),
+        )
+        return userImageModel
 
-            return UserModel.get_model_by_id(model_id=getCurrentAuthId())
+    @jwt_required()
+    @blp.response(status_code=HTTPStatus.CREATED, schema=UserWithImagesSchema)
+    @blp.alt_response(
+        status_code=HTTPStatus.CONFLICT,
+        description=MessageService.get_message("account-not-found").format(
+            "from jwt token"
+        ),
+    )
+    def get(self):
+        userModel: UserModel = UserModel.get_model_by_id(model_id=getCurrentAuthId())
+        if bool(userModel) == False:
+            abort(
+                http_status_code=HTTPStatus.CONFLICT,
+                message=MessageService.get_message("account-not-found").format(
+                    getCurrentAuthId()
+                ),
+            )
+        return userModel
+
+
+@blp.route("/image/<string:image_id>")
+class ImageUserViews(MethodView):
+
+    @jwt_required()
+    @blp.response(status_code=HTTPStatus.OK, schema=UserImageModelSchema)
+    @blp.alt_response(
+        status_code=HTTPStatus.NOT_FOUND,
+        description=MessageService.get_message("image_not_found").format(
+            "pass on url string"
+        ),
+    )
+    def get(self, image_id: str):
+        imageMode: UserImageModel = UserImageModel.get_model_by_id(model_id=image_id)
+        if bool(imageMode) == False:
+            abort(
+                http_status_code=HTTPStatus.NOT_FOUND,
+                message=MessageService.get_message("image_not_found").format(image_id),
+            )
+        return UserImageModel.get_model_by_id(model_id=image_id)
+
+    @jwt_required()
+    @blp.response(status_code=HTTPStatus.ACCEPTED)
+    @blp.alt_response(
+        status_code=HTTPStatus.NOT_FOUND,
+        description=MessageService.get_message("image_not_found").format(
+            "pass on url string"
+        ),
+    )
+    def delete(self, image_id: str):
+        imageMode: UserImageModel = UserImageModel.get_model_by_id(model_id=image_id)
+        if bool(imageMode) == False:
+            abort(
+                http_status_code=HTTPStatus.NOT_FOUND,
+                message=MessageService.get_message("image_not_found").format(image_id),
+            )
+        userImageModel = UserImageModel.delete_model_by_id(model_id=image_id)
+        ImageService.image_delete(public_id=userImageModel.public_id)
+        return {"message": f"image with id '{image_id}' delete  success fully"}
+
+    @jwt_required()
+    @blp.response(status_code=HTTPStatus.ACCEPTED, schema=UserWithImagesSchema)
+    @blp.alt_response(
+        status_code=HTTPStatus.NOT_FOUND,
+        description=MessageService.get_message("image_not_found").format(
+            "pass on url string"
+        ),
+    )
+    @blp.alt_response(
+        status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        description=MessageService.get_message("failed_update_profile").format(
+            "pass on the url string"
+        ),
+    )
+    def put(self, image_id: str):
+        imageMode: UserImageModel = UserImageModel.get_model_by_id(model_id=image_id)
+        if bool(imageMode) == False:
+            abort(
+                http_status_code=HTTPStatus.NOT_FOUND,
+                message=MessageService.get_message("image_not_found").format(image_id),
+            )
+        try:
+            return UserImageModel.put_as_profile(image_id=image_id)
+        except Exception as e:
+            abort(
+                http_status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                message=MessageService.get_message("failed_update_profile").format(
+                    image_id
+                ),
+            )

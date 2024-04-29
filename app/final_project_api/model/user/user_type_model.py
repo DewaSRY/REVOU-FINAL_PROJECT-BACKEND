@@ -1,7 +1,7 @@
 """_summary_
 """
 
-from .user_type_data import UserTypeData
+from .user_data import UserTypeData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import Integer, String
 from app.model_base_service import db, ModelBaseService

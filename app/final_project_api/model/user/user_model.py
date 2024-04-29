@@ -13,7 +13,7 @@ from app.model_base_service import db, ModelBaseService
 from app.model_base_service.db import Base
 from app.model_base_service.model_base import ModelBase
 
-from .user_data import UserData
+from .user_data import UserData, UserUpdateData
 from typing import Union
 from pprint import pprint
 
@@ -24,12 +24,10 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
     id = mapped_column("user_id", String(36), primary_key=True)
     username = mapped_column("username", String(50), unique=True, nullable=False)
 
-    phone_number = mapped_column(
-        "phone_number", String(50), unique=True, nullable=False
-    )
-    address = mapped_column("address", String(50), unique=True, nullable=False)
-    occupation = mapped_column("occupation", String(50), unique=True, nullable=False)
-    description = mapped_column("description", Text, unique=True, nullable=False)
+    phone_number = mapped_column("phone_number", String(20))
+    address = mapped_column("address", String(50))
+    occupation = mapped_column("occupation", String(50))
+    description = mapped_column("description", Text)
 
     email = mapped_column("email", String(50), unique=True)
     profile_url = mapped_column("profile_url", String(50), server_default="")
@@ -79,14 +77,14 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
         return type.name
 
     @property
-    def user_images(self):
+    def images(self):
         from .user_image_model import UserImageModel
 
         userImages = UserImageModel.get_image_by_user_id(self.id)
         if len(userImages) == 0:
             return []
 
-        return [img.secure_url for img in userImages]
+        return userImages
 
     def _get_model_by_id(self, model_id: str) -> Union["UserModel", None]:
         return self.session.query(UserModel).filter(UserModel.id == model_id).first()
@@ -96,51 +94,40 @@ class UserModel(UserData, ModelBaseService[UserData], db.Model):
 
     def _update(
         self,
-        username: str = None,
-        phone_number: str = None,
-        address: str = None,
-        occupation: str = None,
-        description: str = None,
-        email: str = None,
-        password: str = None,
+        username: str = "",
+        phone_number: str = "",
+        address: str = "",
+        occupation: str = "",
+        description: str = "",
+        email: str = "",
+        password: str = "",
     ):
-        if username != None:
+        if len(username) != 0:
             self.username = username
-        if phone_number != None:
+        if len(phone_number) != 0:
             self.phone_number = phone_number
-        if address != None:
+        if len(address) != 0:
             self.address = address
-        if occupation != None:
+        if len(occupation) != 0:
             self.occupation = occupation
-        if description != None:
+        if len(description) != 0:
             self.description = description
-        if email != None:
+        if len(email) != 0:
             self.email = email
-        if password != None:
+        if len(password) != 0:
             self._set_password(password)
         self.update_at = datetime.now()
 
     @classmethod
-    def update_with_id(
-        cls,
-        user_id: str,
-        username: str = None,
-        phone_number: str = None,
-        address: str = None,
-        occupation: str = None,
-        description: str = None,
-        email: str = None,
-        password: str = None,
-    ):
+    def update_with_update_data(cls, user_id: str, update_data: UserUpdateData):
         userModel: UserModel = UserModel.get_model_by_id(model_id=user_id)
         userModel._update(
-            username=username,
-            address=address,
-            description=description,
-            email=email,
-            occupation=occupation,
-            password=password,
-            phone_number=phone_number,
+            username=update_data.username,
+            email=update_data.email,
+            address=update_data.address,
+            description=update_data.description,
+            occupation=update_data.occupation,
+            phone_number=update_data.phone_number,
         )
         cls.session.add(userModel)
         cls.session.commit()

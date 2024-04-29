@@ -17,7 +17,7 @@ class DataBaseDefault:
 
     id: str = field(init=False)
     update_at: datetime = field(init=False)
-    create_at: datetime = field(init=False)
+    create_at: datetime = field(init=False, default_factory=lambda: datetime.now())
 
     def __init__(self):
         self.id = str(uuid4())

@@ -30,4 +30,3 @@ class CloudinaryService(ImageServiceAble):
         image_delete_result = delete_resources(
             public_ids, resource_type="image", type="upload"
         )
-        print(image_delete_result)

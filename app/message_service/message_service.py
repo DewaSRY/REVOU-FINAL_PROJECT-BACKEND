@@ -8,7 +8,7 @@ import json
 from os import getcwd, path
 
 
-class MassageService:
+class MessageService:
     base_dir = basedir = path.join(getcwd(), "app", "message_service")
     default_locale = "en-gb"
     cached_strings = {}
