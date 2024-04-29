@@ -76,10 +76,11 @@ class ModelBaseService[T](ModelBase):
             raise e
 
     @classmethod
-    def delete_model(cls, model: T):
+    def delete_model(cls, model: T) -> "ModelBaseService":
         try:
             model._delete()
             cls.session.commit()
+            return model
         except Exception as e:
             raise e
 

@@ -23,6 +23,7 @@ from app.final_project_api.model.product import (
     ProductImageModel,
     ProductModel,
     ProductCreateData,
+    ProductUpdateData,
 )
 from app.final_project_api.model.business import BusinessModel
 from app.final_project_api.model.user import UserModel
@@ -35,6 +36,7 @@ from .product_schemas import (
     ProductCreateSchema,
     ProductImageModelSchema,
     ProductWithImageModel,
+    ProductUpdateSchema,
 )
 
 
@@ -59,9 +61,36 @@ class ProductViews(MethodView):
     @jwt_required()
     @blp.arguments(schema=ProductCreateSchema)
     @blp.response(schema=ProductModelSchema, status_code=HTTPStatus.CREATED)
+    @blp.alt_response(
+        status_code=HTTPStatus.NOT_FOUND,
+        description=MessageService.get_message("business-not-found").format(
+            "on data payload"
+        ),
+    )
+    @blp.alt_response(
+        status_code=HTTPStatus.NOT_ACCEPTABLE,
+        description=MessageService.get_message("user_id_on_business_not_match").format(
+            "on data payload"
+        ),
+    )
     def post(self, product_data: ProductCreateData):
-        businessModel: BusinessModel = BusinessModel.get_by_user_id()
-
+        businessModel: BusinessModel = BusinessModel.get_model_by_id(
+            model_id=product_data.business_id
+        )
+        if bool(businessModel) == False:
+            abort(
+                http_status_code=HTTPStatus.NOT_FOUND,
+                message=MessageService.get_message("business-not-found").format(
+                    product_data.business_id
+                ),
+            )
+        if businessModel.user_id != getCurrentAuthId():
+            abort(
+                http_status_code=HTTPStatus.NOT_ACCEPTABLE,
+                message=MessageService.get_message(
+                    "user_id_on_business_not_match"
+                ).format(businessModel.id),
+            )
         try:
             return ProductModel.add_model(
                 business_id=product_data.business_id,
@@ -77,14 +106,79 @@ class ProductViews(MethodView):
 class ProductByIdViews(MethodView):
 
     @blp.response(schema=ProductModelSchema, status_code=HTTPStatus.OK)
-    def get(self, product_id: id):
-        return ProductModel.get_model_by_id(model_id=product_id)
+    @blp.alt_response(
+        status_code=HTTPStatus.NOT_FOUND,
+        description=MessageService.get_message("product_not_found").format(
+            "pass ont url"
+        ),
+    )
+    @jwt_required()
+    def get(self, product_id: str):
+        productModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
+        if bool(productModel) == False or (
+            productModel.delete_model == True
+            or productModel.user_id != getCurrentAuthId()
+        ):
+            abort(
+                http_status_code=HTTPStatus.NOT_FOUND,
+                message=MessageService.get_message("product_not_found").format(
+                    product_id
+                ),
+            )
 
-    def put():
-        pass
+        return productModel
 
-    def delete(self):
-        pass
+    @jwt_required()
+    @blp.arguments(schema=ProductUpdateSchema)
+    @blp.response(schema=ProductModelSchema, status_code=HTTPStatus.CREATED)
+    @blp.alt_response(
+        status_code=HTTPStatus.NOT_ACCEPTABLE,
+        description=MessageService.get_message("user_id_on_product_not_match").format(
+            "on url string"
+        ),
+    )
+    def put(self, product_data: ProductUpdateData, product_id: str):
+        productModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
+        if productModel.user_id != getCurrentAuthId():
+            abort(
+                http_status_code=HTTPStatus.NOT_ACCEPTABLE,
+                message=MessageService.get_message(
+                    "user_id_on_product_not_match"
+                ).format(product_id),
+            )
+        try:
+            return ProductModel.update_with_update_data(
+                product_id=product_id, product_data=product_data
+            )
+        except Exception as e:
+            abort(http_status_code=HTTPStatus.INTERNAL_SERVER_ERROR, message=str(e))
+
+    @jwt_required()
+    @blp.alt_response(
+        status_code=HTTPStatus.NOT_FOUND,
+        description=MessageService.get_message("product_not_found").format(
+            "pass ont url"
+        ),
+    )
+    def delete(self, product_id: str):
+        try:
+            deleteModel: ProductModel = ProductModel.delete_model_by_id(
+                model_id=product_id
+            )
+            if bool(deleteModel) == False:
+                abort(
+                    http_status_code=HTTPStatus.NOT_FOUND,
+                    message=MessageService.get_message("product_not_found").format(
+                        product_id
+                    ),
+                )
+            return {"message": f"product with id '{product_id}' success full delete"}
+        except Exception as e:
+            print(str(e))
+            abort(
+                http_status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                message=f"failed to delete product with id '{product_id}' ",
+            )
 
 
 # TODO: handle product  image

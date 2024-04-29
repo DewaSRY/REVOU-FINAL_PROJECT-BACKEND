@@ -2,7 +2,7 @@
 """
 
 from marshmallow import Schema, fields, post_load
-from app.final_project_api.model.product import ProductCreateData
+from app.final_project_api.model.product import ProductCreateData, ProductUpdateData
 from app.image_upload_service import ImageModelSchema
 
 
@@ -29,6 +29,16 @@ class ProductCreateSchema(Schema):
     @post_load
     def get_data(self, data, **kwarg):
         return ProductCreateData(**data)
+
+
+class ProductUpdateSchema(Schema):
+    product_name = fields.Str()
+    product_price = fields.Float()
+    description = fields.Str()
+
+    @post_load
+    def get_data(self, data, **kwarg):
+        return ProductUpdateData(**data)
 
 
 class ProductPublicSchemas(Schema):

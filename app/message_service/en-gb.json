@@ -20,5 +20,9 @@
     "duplicate-error": " '{}' already use",
     "not-found": "cannot find user with  {}",
     "password-not-match": "password doesn't match",
-    "account-not-found": "account with  '{}' not found"
+    "account-not-found": "account with  '{}' not found",
+    "business-not-found": "business with id '{}' not found",
+    "user_id_on_business_not_match": "user id on business id '{}' not match",
+    "user_id_on_product_not_match": "user id on product id '{}' not match",
+    "product_not_found": "product with id '{}' not found"
 }

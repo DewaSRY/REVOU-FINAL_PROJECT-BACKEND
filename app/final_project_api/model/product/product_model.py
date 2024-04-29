@@ -65,6 +65,9 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
     def _get_all_model(self):
         return self.session.query(ProductModel).all()
 
+    def _get_model_by_id(self, model_id: str):
+        return self.session.query(ProductModel).filter(ProductModel.id == model_id)
+
     def _update(
         self,
         product_name: str = "",
@@ -77,6 +80,14 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
             self.product_name = product_name
         if len(description) != 0:
             self.description = description
+
+    @classmethod
+    def delete_model_by_id(cls, model_id: str):
+        productModel: ProductModel = ProductModel.get_model_by_id(model_id=model_id)
+        productModel.is_delete = True
+        cls.session.add(productModel)
+        cls.session.commit()
+        return productModel
 
     @classmethod
     def update_with_update_data(cls, product_id: str, product_data: ProductUpdateData):
