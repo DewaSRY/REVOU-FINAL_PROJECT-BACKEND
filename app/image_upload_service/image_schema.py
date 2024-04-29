@@ -32,3 +32,11 @@ class ImageSchema(Schema):
     @post_load
     def get_data(self, data, **kwargs):
         return ImagesPayloadData(**data)
+
+
+class ImageModelSchema(Schema):
+    id = fields.Str()
+    public_id = fields.Str()
+    secure_url = fields.Str()
+    user_id = fields.Str()
+    create_at = fields.DateTime()

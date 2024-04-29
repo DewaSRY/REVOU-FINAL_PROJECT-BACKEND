@@ -1,10 +1,12 @@
 """_summary_
 """
 
-from .product_image_data import ProductImageData
+from .product_data import ProductImageData
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import String, Integer, ForeignKey
+from sqlalchemy import String, Integer, ForeignKey, DateTime
+from sqlalchemy.sql import func
 from app.model_base_service import db, ModelBaseService
+from .product_model import ProductModel
 
 
 class ProductImageModel(
@@ -16,13 +18,53 @@ class ProductImageModel(
     product_id = mapped_column(
         "product_id", String(36), ForeignKey("product.product_id")
     )
+    create_at = mapped_column(
+        "created_at", DateTime(timezone=True), server_default=func.now()
+    )
+
+    @property
+    def product_name(self):
+
+        productModel: ProductModel = ProductModel.get_model_by_id(
+            model_id=self.product_id
+        )
+        return productModel.product_name
 
     def _get_all_model(self):
         return self.session.query(ProductImageModel).all()
 
-    def _get_model_by_id(self, model_id: str) -> "ProductImageModel":
+    @classmethod
+    def put_as_profile(cls, image_id: str) -> "ProductModel":
+
+        imageMode = ProductImageModel.get_model_by_id(model_id=image_id)
+        productModel: ProductModel = ProductModel.get_model_by_id(
+            model_id=imageMode.user_id
+        )
+        productModel.profile_url = imageMode.secure_url
+        cls.session.add(productModel)
+        cls.session.commit()
+        return productModel
+
+    @classmethod
+    def delete_model_by_id(cls, model_id: str):
+        from .product_model import ProductModel
+
+        imageModel = ProductImageModel.get_model_by_id(model_id=model_id)
+        productModel: ProductModel = ProductModel.get_model_by_id(
+            model_id=imageModel.user_id
+        )
+        if imageModel.secure_url == productModel.profile_url:
+            productModel.profile_url = ""
+            cls.session.add(productModel)
+
+        cls.session.delete(imageModel)
+        cls.session.commit()
+        return imageModel
+
+    @classmethod
+    def get_model_by_id(cls, model_id: str):
         return (
-            self.session.query(ProductImageModel)
+            cls.session.query(ProductImageModel)
             .filter(ProductImageModel.id == model_id)
             .first()
         )

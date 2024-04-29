@@ -6,14 +6,7 @@ from app.final_project_api.views.business.business_schemas import BusinessSchema
 from app.final_project_api.views.product.product_schemas import ProductSchema
 
 from app.final_project_api.model.user import AuthData, UserUpdateData
-
-
-class ImageModelSchema(Schema):
-    id = fields.Str()
-    public_id = fields.Str()
-    secure_url = fields.Str()
-    user_id = fields.Str()
-    create_at = fields.DateTime()
+from app.image_upload_service import ImageModelSchema
 
 
 class UserImageModelSchema(ImageModelSchema):
@@ -28,10 +21,10 @@ class UserWithImagesSchema(Schema):
     id = fields.Str()
     create_at = fields.DateTime()
     update_at = fields.DateTime()
+    profile_url = fields.Str()
     username = fields.String()
     email = fields.Email()
     user_type = fields.Str()
-    profile_url = fields.Str()
     images = fields.List(fields.Nested(ImageModelSchema))
 
 

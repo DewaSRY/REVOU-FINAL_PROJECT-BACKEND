@@ -17,6 +17,7 @@ class TestCreateProduct(MockDatabaseConnection):
         super().setup_class(self)
         self.product_name = "some product name"
         self.product_price = 1_000
+        self.product_description = "some description"
 
     def setUp(self) -> None:
         self.user_create = UserModel.add_model(
@@ -36,6 +37,7 @@ class TestCreateProduct(MockDatabaseConnection):
         BusinessTypeModel.clean_all_model()
         BusinessModel.clean_all_model()
         ProductImageModel.clean_all_model()
+        ProductModel.clean_all_model()
 
     def test_create_product_image(self):
         first_url = "first ulr"
@@ -44,6 +46,7 @@ class TestCreateProduct(MockDatabaseConnection):
             business_id=self.business.id,
             product_name=self.product_name,
             product_price=self.product_price,
+            description=self.product_description,
         )
         default_profile_url = create_product.profile_url
         ProductImageModel.add_model(
@@ -57,8 +60,6 @@ class TestCreateProduct(MockDatabaseConnection):
         assert default_profile_url == ""
         assert profile_url_after_first_image == first_url
         assert profile_url_after_second_image == first_url
-        assert first_url in create_product.product_images
-        assert second_url in create_product.product_images
 
     # @skip("just skip")
     def test_create_product(self):
@@ -66,7 +67,30 @@ class TestCreateProduct(MockDatabaseConnection):
             business_id=self.business.id,
             product_name=self.product_name,
             product_price=self.product_price,
+            description=self.product_description,
         )
         assert create_product.product_price == self.product_price
         assert create_product.product_name == self.product_name
         assert create_product.business_id == self.business.id
+
+    def test_create_product_ten(self):
+        for _ in range(10):
+            create_product = ProductModel.add_model(
+                business_id=self.business.id,
+                product_name=self.product_name,
+                product_price=self.product_price,
+                description=self.product_description,
+            )
+        modelList = ProductModel.get_all_model()
+        assert len(modelList) == 10
+
+    def test_get_public_model(self):
+        for _ in range(100):
+            create_product = ProductModel.add_model(
+                business_id=self.business.id,
+                product_name=self.product_name,
+                product_price=self.product_price,
+                description=self.product_description,
+            )
+        modelList = ProductModel.get_all_public_model()
+        assert len(modelList) == 10

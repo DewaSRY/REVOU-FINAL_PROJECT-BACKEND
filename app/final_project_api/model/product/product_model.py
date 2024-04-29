@@ -2,21 +2,26 @@
 """
 
 from app.model_base_service.db import Base
-from .product_data import ProductData
+from .product_data import ProductData, ProductUpdateData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.sql import func
 from datetime import datetime
-from sqlalchemy import String, DateTime, Integer, ForeignKey, Float
+from sqlalchemy import String, DateTime, Integer, ForeignKey, Float, Boolean
 from app.model_base_service import db, ModelBaseService
 from typing import Union
+
+from app.final_project_api.util import QueryData
 
 
 class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
     __tablename__ = "product"
     id = mapped_column("product_id", String(36), primary_key=True)
     product_name = mapped_column("product_name", String(50))
+    description = mapped_column("description", String(50))
     profile_url = mapped_column("profile_url", String(50))
     product_price = mapped_column("product_price", Float(10.2))
+    is_delete = mapped_column("is_delete", Boolean, default=False)
+
     create_at = mapped_column(
         "created_at", DateTime(timezone=True), server_default=func.now()
     )
@@ -49,7 +54,7 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
         imageList: list[PM] = PM.get_image_by_product_id(product_id=self.id)
         if len(imageList) == 0:
             return []
-        return [img.secure_url for img in imageList]
+        return imageList
 
     def _set_user_id(self):
         from app.final_project_api.model.business import BusinessModel as BM
@@ -60,19 +65,57 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
     def _get_all_model(self):
         return self.session.query(ProductModel).all()
 
-    def _get_model_by_id(self, model_id: str) -> "ProductModel":
+    def _update(
+        self,
+        product_name: str = "",
+        product_price: float = 0,
+        description: str = "",
+    ):
+        if product_price != self.product_price:
+            self.product_price = product_price
+        if len(product_name) != 0:
+            self.product_name = product_name
+        if len(description) != 0:
+            self.description = description
+
+    @classmethod
+    def update_with_update_data(cls, product_id: str, product_data: ProductUpdateData):
+        productModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
+        productModel._update(
+            product_name=product_data.product_name,
+            description=product_data.description,
+            product_price=product_data.product_price,
+        )
+        cls.session.add(productModel)
+        cls.session.commit()
+        return productModel
+
+    @classmethod
+    def get_model_by_id(cls, model_id: str):
         return (
-            self.session.query(ProductModel).filter(ProductModel.id == model_id).first()
+            cls.session.query(ProductModel).filter(ProductModel.id == model_id).first()
+        )
+
+    @classmethod
+    def get_all_public_model(cls, query_data: QueryData = QueryData()):
+        offset = (query_data.page - 1) * query_data.limit
+        queryPointer = cls.session.query(ProductModel)
+        return (
+            queryPointer.filter(ProductModel.is_delete == False)
+            .limit(query_data.limit)
+            .offset(offset)
+            .all()
         )
 
     @classmethod
     def add_model(
-        cls, business_id: str, product_name: str, product_price: float
+        cls, business_id: str, product_name: str, product_price: float, description: str
     ) -> "ProductModel":
         model = ProductModel(
             business_id=business_id,
             product_name=product_name,
             product_price=product_price,
+            description=description,
         )
         cls.session.add(model)
         cls.session.commit()
