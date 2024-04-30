@@ -107,8 +107,14 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
 
     @classmethod
     def delete_by_id(cls, model_id: str):
+        from app.final_project_api.model.product import ProductModel
+
         businessModel: BusinessModel = BusinessModel.get_model_by_id(model_id=model_id)
         businessModel.is_delete = True
+        productList: list[ProductModel] = businessModel.product
+        for product in productList:
+            product.is_delete = True
+
         cls.session.add(businessModel)
         cls.session.commit()
         return businessModel
@@ -120,7 +126,7 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
         )
         businessModel._update(
             business_name=update_data.business_name,
-            business_type_name=update_data.business_type_name,
+            business_type_name=update_data.business_types,
             description=update_data.description,
         )
         cls.session.add(businessModel)
@@ -129,8 +135,12 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
 
     @classmethod
     def get_all_public_model(cls, query_data: QueryData = QueryData()):
-        offset = (query_data.page - 1) * query_data.limit
         queryPointer = cls.session.query(BusinessModel)
+        if len(query_data.search) != 0:
+            return queryPointer.filter(
+                BusinessModel.business_name.like(query_data.search)
+            ).all()
+        offset = (query_data.page - 1) * query_data.limit
         return (
             queryPointer.filter(BusinessModel.is_delete == False)
             .limit(query_data.limit)

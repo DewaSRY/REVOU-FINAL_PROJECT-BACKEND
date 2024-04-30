@@ -9,11 +9,13 @@ from dataclasses import dataclass, field
 class QueryData:
     page: int = field(default_factory=lambda: 1)
     limit: int = field(default_factory=lambda: 10)
+    search: str = field(default_factory=str)
 
 
 class QuerySchema(Schema):
     page = fields.Integer()
     limit = fields.Integer()
+    search = fields.Str()
 
     @post_load
     def get_data(self, data, **kwargs):

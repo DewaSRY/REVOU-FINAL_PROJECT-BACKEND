@@ -39,9 +39,7 @@ blp = Blueprint(
     "users",
     __name__,
     url_prefix="/api/user",
-    description="""
-                user management end point
-                """,
+    description="user rout end point, most of it is user account setting from the personal data to the list of personal ownership",
 )
 
 

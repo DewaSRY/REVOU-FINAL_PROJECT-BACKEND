@@ -38,9 +38,11 @@ class ProductImageModel(
     @classmethod
     def put_as_profile(cls, image_id: str) -> "ProductModel":
 
-        imageMode = ProductImageModel.get_model_by_id(model_id=image_id)
+        imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
+            model_id=image_id
+        )
         productModel: ProductModel = ProductModel.get_model_by_id(
-            model_id=imageMode.user_id
+            model_id=imageMode.product_id
         )
         productModel.profile_url = imageMode.secure_url
         cls.session.add(productModel)

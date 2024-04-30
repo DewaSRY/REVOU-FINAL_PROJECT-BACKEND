@@ -49,5 +49,15 @@
         "code": 422,
         "message": "the file sent is not image type",
         "status": "Unprocessable Entity"
+    },
+    "failed_to_create_business_example": {
+        "business_name": "some business name",
+        "business_types": "foodd",
+        "description": "some buisness description"
+    },
+    "image_not_found_example": {
+        "code": 404,
+        "message": "image with id '76321afe-66ca-4d3d-abaf-186477e67a26' not found",
+        "status": "Not Found"
     }
 }

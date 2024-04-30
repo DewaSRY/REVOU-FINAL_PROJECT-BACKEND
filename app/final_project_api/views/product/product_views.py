@@ -44,9 +44,7 @@ blp = Blueprint(
     "product",
     __name__,
     url_prefix="/api/product",
-    description="""
-                user management end point
-                """,
+    description="manage product user product ",
 )
 
 
@@ -56,6 +54,7 @@ class ProductViews(MethodView):
     @blp.arguments(schema=QuerySchema, location="query")
     @blp.response(schema=ProductPublicSchemas(many=True), status_code=HTTPStatus.OK)
     def get(self, query_data: QueryData):
+        """As a user, i can get all product event without access token"""
         return ProductModel.get_all_public_model(query_data=query_data)
 
     @jwt_required()
@@ -74,10 +73,11 @@ class ProductViews(MethodView):
         ),
     )
     def post(self, product_data: ProductCreateData):
+        """As a user, i can create product"""
         businessModel: BusinessModel = BusinessModel.get_model_by_id(
             model_id=product_data.business_id
         )
-        if bool(businessModel) == False:
+        if bool(businessModel) == False or businessModel.user_id != getCurrentAuthId():
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,
                 message=MessageService.get_message("business-not-found").format(
@@ -114,6 +114,7 @@ class ProductByIdViews(MethodView):
     )
     @jwt_required()
     def get(self, product_id: str):
+        """as a user i can get my product by its id"""
         productModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
         if bool(productModel) == False or (
             productModel.delete_model == True
@@ -138,6 +139,7 @@ class ProductByIdViews(MethodView):
         ),
     )
     def put(self, product_data: ProductUpdateData, product_id: str):
+        """As a user,i can update my product by its id"""
         productModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
         if productModel.user_id != getCurrentAuthId():
             abort(
@@ -161,6 +163,7 @@ class ProductByIdViews(MethodView):
         ),
     )
     def delete(self, product_id: str):
+        """As a user, i can delete my product by its id"""
         try:
             deleteModel: ProductModel = ProductModel.delete_model_by_id(
                 model_id=product_id
@@ -193,6 +196,7 @@ class ImageUserViews(MethodView):
         description=MessageService.get_message("file_not_image_type"),
     )
     def post(self, data: ImagesPayloadData, product_id: str):
+        """As a user, i can post image to my product"""
         image_data: Upload = data.image
         if ImageService.check_extension(image_data=image_data) != True:
             abort(
@@ -220,12 +224,7 @@ class ImageUserViews(MethodView):
         ),
     )
     def get(self, product_id: str):
-        """_summary_
-        Args:
-            product_id (str): _description_
-        Returns:
-            _type_: _description_
-        """
+        """As a user, i can get image by its id"""
         userModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
         if bool(userModel) == False:
             abort(
@@ -248,7 +247,8 @@ class ImageUserViews(MethodView):
             "pass on url string"
         ),
     )
-    def get(self, product_id: str, image_id: str):
+    def get(self, image_id: str):
+        """As a user, i can get image by its id"""
         imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
             model_id=image_id
         )
@@ -267,7 +267,8 @@ class ImageUserViews(MethodView):
             "pass on url string"
         ),
     )
-    def delete(self, product_id: str, image_id: str):
+    def delete(self, image_id: str):
+        """As a user, i can delete image by its id"""
         imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
             model_id=image_id
         )
@@ -294,7 +295,8 @@ class ImageUserViews(MethodView):
             "pass on the url string"
         ),
     )
-    def put(self, product_id: str, image_id: str):
+    def put(self, image_id: str):
+        """As a user i can put image by its id to the product profile"""
         imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
             model_id=image_id
         )
@@ -306,6 +308,7 @@ class ImageUserViews(MethodView):
         try:
             return ProductImageModel.put_as_profile(image_id=image_id)
         except Exception as e:
+            print(e)
             abort(
                 http_status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 message=MessageService.get_message("failed_update_profile").format(

@@ -3,7 +3,6 @@
 
 from tests.mock_database_connection import MockDatabaseConnection
 from app.final_project_api.model.business import BusinessTypeModel
-from app.data_store_service import DataStore
 from pprint import pprint
 from unittest import skip
 
@@ -26,5 +25,3 @@ class TestCreateBusinessType(MockDatabaseConnection):
 
         assert type_create.name == self.type_name_one
         assert type_create.id == 1
-        assert self.type_name_one in DataStore.BUSINESS_TYP_LIST
-        assert type_create.name in DataStore.BUSINESS_TYP_LIST

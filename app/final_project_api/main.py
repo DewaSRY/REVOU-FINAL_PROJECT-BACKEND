@@ -8,13 +8,13 @@ from http import HTTPStatus
 from dotenv import load_dotenv
 
 from flask import Flask, jsonify, redirect
-from flask_smorest import Api
+from flask_smorest import Api, Blueprint
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS, cross_origin
 
 
-from .views import UserBluePrint, BusinessBluePrint, ProductBluePrint
+from .views import BusinessBluePrint, ProductBluePrint, UserBluePrint
 from .model.user import UserTypeModel
 from .model.business import BusinessTypeModel
 
@@ -28,7 +28,6 @@ def create_app():
     load_dotenv(".env")
     app.config.from_object("config_default")
     app.config.from_envvar("APPLICATION_SETTINGS", silent=True)
-
     jwt = JWTManager(app)
     db.init_app(app)
     migrate = Migrate(app, db)
@@ -69,6 +68,7 @@ def create_app():
             BusinessTypeModel.add_model(name="food")
             BusinessTypeModel.add_model(name="book")
 
+    # api.register_blueprint(mainApp)
     api.register_blueprint(UserBluePrint)
     api.register_blueprint(BusinessBluePrint)
     api.register_blueprint(ProductBluePrint)
@@ -76,6 +76,6 @@ def create_app():
     @app.route("/api")
     def index():
         # return app.send_static_file("index.html")
-        return redirect("api/swagger-ui")
+        return redirect("api/redoc")
 
     return app

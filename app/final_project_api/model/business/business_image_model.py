@@ -51,9 +51,11 @@ class BusinessImageModel(
     @classmethod
     def put_as_profile(cls, image_id: str) -> BusinessModel:
 
-        imageMode = BusinessModel.get_model_by_id(model_id=image_id)
+        imageMode: BusinessImageModel = BusinessImageModel.get_model_by_id(
+            model_id=image_id
+        )
         businessModel: BusinessModel = BusinessModel.get_model_by_id(
-            model_id=imageMode.user_id
+            model_id=imageMode.business_id
         )
         businessModel.profile_url = imageMode.secure_url
         cls.session.add(businessModel)
