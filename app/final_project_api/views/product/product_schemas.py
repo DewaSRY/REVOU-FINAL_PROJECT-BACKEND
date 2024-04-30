@@ -18,6 +18,8 @@ class ProductSchema(Schema):
     profile_url = fields.Str()
     id = fields.Str()
     description = fields.Str()
+    create_at = fields.DateTime()
+    update_at = fields.DateTime()
 
 
 class ProductCreateSchema(Schema):
@@ -52,6 +54,7 @@ class ProductPublicSchemas(Schema):
     username = fields.Str(required=True)
     business_id = fields.Str(required=True)
     user_id = fields.Str(required=True)
+    description = fields.Str()
 
 
 class PrivateProductSchema(ProductPublicSchemas):

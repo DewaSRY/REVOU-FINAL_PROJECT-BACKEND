@@ -30,6 +30,7 @@ class TestCreateProduct(MockDatabaseConnection):
             user_id=self.user_create.id,
             business_name="some business name",
             business_type_name=self.business_type.name,
+            description="some business description ",
         )
 
     def tearDown(self) -> None:

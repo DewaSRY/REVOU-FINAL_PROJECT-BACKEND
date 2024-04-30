@@ -1,11 +1,10 @@
 """_summary_
 """
 
-from .business_type_data import BusinessTypeData
+from .business_data import BusinessTypeData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import String, Integer
 from app.model_base_service import ModelBaseService, db
-from app.data_store_service import DataStore
 from typing import Union
 
 
@@ -26,6 +25,9 @@ class BusinessTypeModel(
             .first()
         )
 
+    def getStore(self):
+        return self.name
+
     @classmethod
     def get_match_model_by_name(
         cls, model_name: str
@@ -41,6 +43,11 @@ class BusinessTypeModel(
         )
 
     @classmethod
+    def get_available_type(cls):
+        typList: BusinessTypeModel = BusinessTypeModel.get_all_model()
+        return [model.name for model in typList]
+
+    @classmethod
     def add_model(cls, name: str) -> "BusinessTypeModel":
         """add_model
         Args:
@@ -52,9 +59,9 @@ class BusinessTypeModel(
         """
         try:
             model = BusinessTypeModel(name=name)
-            DataStore.BUSINESS_TYP_LIST.append(model.name)
             cls.session.add(model)
             cls.session.commit()
             return model
         except Exception as e:
+            print(e)
             raise Exception(f"failed to add Business type with name : {name}")

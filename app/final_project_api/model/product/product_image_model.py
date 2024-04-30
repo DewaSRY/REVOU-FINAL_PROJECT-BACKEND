@@ -7,13 +7,15 @@ from sqlalchemy import String, Integer, ForeignKey, DateTime
 from sqlalchemy.sql import func
 from app.model_base_service import db, ModelBaseService
 from .product_model import ProductModel
+from app.message_service import MessageService
 
 
 class ProductImageModel(
     ProductImageData, ModelBaseService["ProductImageModel"], db.Model
 ):
     __tablename__ = "product_images"
-    public_id = mapped_column("image_id", String(36), primary_key=True)
+    id = mapped_column("id", String(36), primary_key=True)
+    public_id = mapped_column("public_id", String(36))
     secure_url = mapped_column("secure_url", String(50))
     product_id = mapped_column(
         "product_id", String(36), ForeignKey("product.product_id")
@@ -84,6 +86,10 @@ class ProductImageModel(
         from .product_model import ProductModel
 
         productModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
+        if bool(productModel) == False:
+            message = MessageService.get_message("product_not_found").format(product_id)
+            raise Exception(message)
+
         if bool(productModel.profile_url) != True:
             productModel.profile_url = secure_url
 

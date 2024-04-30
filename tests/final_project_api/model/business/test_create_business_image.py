@@ -14,7 +14,7 @@ from unittest import skip
 from uuid import uuid4
 
 
-class TestCreateBusiness(MockDatabaseConnection):
+class TestCreateBusinessImage(MockDatabaseConnection):
 
     def setup_class(self):
         super().setup_class(self)

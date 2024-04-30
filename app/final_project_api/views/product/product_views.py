@@ -43,7 +43,7 @@ from .product_schemas import (
 blp = Blueprint(
     "product",
     __name__,
-    url_prefix="/product",
+    url_prefix="/api/product",
     description="""
                 user management end point
                 """,
@@ -182,7 +182,7 @@ class ProductByIdViews(MethodView):
 
 
 # TODO: handle product  image
-@blp.route("/image")
+@blp.route("/image/<string:product_id>")
 class ImageUserViews(MethodView):
 
     @jwt_required()
@@ -192,7 +192,7 @@ class ImageUserViews(MethodView):
         status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
         description=MessageService.get_message("file_not_image_type"),
     )
-    def post(self, data: ImagesPayloadData):
+    def post(self, data: ImagesPayloadData, product_id: str):
         image_data: Upload = data.image
         if ImageService.check_extension(image_data=image_data) != True:
             abort(
@@ -200,12 +200,16 @@ class ImageUserViews(MethodView):
                 message=MessageService.get_message("file_not_image_type"),
             )
         response_data: ImageData = ImageService.image_save(image_data=image_data)
-        userImageModel = ProductImageModel.add_model(
-            public_id=response_data.public_id,
-            secure_url=response_data.secure_url,
-            user_id=getCurrentAuthId(),
-        )
-        return userImageModel
+        try:
+            userImageModel = ProductImageModel.add_model(
+                public_id=response_data.public_id,
+                secure_url=response_data.secure_url,
+                product_id=product_id,
+            )
+            return userImageModel
+        except Exception as e:
+            ImageService.image_delete(public_id=response_data.public_id)
+            abort(http_status_code=HTTPStatus.NOT_FOUND, message=str(e))
 
     @jwt_required()
     @blp.response(status_code=HTTPStatus.CREATED, schema=ProductWithImageModel)
@@ -215,21 +219,25 @@ class ImageUserViews(MethodView):
             "from jwt token"
         ),
     )
-    def get(self):
-        userModel: ProductModel = ProductModel.get_model_by_id(
-            model_id=getCurrentAuthId()
-        )
+    def get(self, product_id: str):
+        """_summary_
+        Args:
+            product_id (str): _description_
+        Returns:
+            _type_: _description_
+        """
+        userModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
         if bool(userModel) == False:
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
-                message=MessageService.get_message("account-not-found").format(
-                    getCurrentAuthId()
+                message=MessageService.get_message("product_not_found").format(
+                    product_id
                 ),
             )
         return userModel
 
 
-@blp.route("/image/<string:image_id>")
+@blp.route("/product-image/<string:image_id>")
 class ImageUserViews(MethodView):
 
     @jwt_required()
@@ -240,7 +248,7 @@ class ImageUserViews(MethodView):
             "pass on url string"
         ),
     )
-    def get(self, image_id: str):
+    def get(self, product_id: str, image_id: str):
         imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
             model_id=image_id
         )
@@ -259,7 +267,7 @@ class ImageUserViews(MethodView):
             "pass on url string"
         ),
     )
-    def delete(self, image_id: str):
+    def delete(self, product_id: str, image_id: str):
         imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
             model_id=image_id
         )
@@ -286,7 +294,7 @@ class ImageUserViews(MethodView):
             "pass on the url string"
         ),
     )
-    def put(self, image_id: str):
+    def put(self, product_id: str, image_id: str):
         imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
             model_id=image_id
         )

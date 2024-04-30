@@ -5,7 +5,6 @@ from .user_data import UserTypeData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import Integer, String
 from app.model_base_service import db, ModelBaseService
-from app.data_store_service import DataStore
 
 
 class UserTypeModel(UserTypeData, ModelBaseService["UserTypeModel"], db.Model):
@@ -28,10 +27,14 @@ class UserTypeModel(UserTypeData, ModelBaseService["UserTypeModel"], db.Model):
         return self.session.query(UserTypeModel).all()
 
     @classmethod
+    def get_available_type(cls):
+        typList: UserTypeModel = UserTypeModel.get_all_model()
+        return [model.name for model in typList]
+
+    @classmethod
     def add_model(cls, name: str) -> "UserTypeModel":
         try:
             model = UserTypeModel(name=name)
-            DataStore.USER_TYPE_LIST.append(model.name)
             cls.session.add(model)
             cls.session.commit()
             return model

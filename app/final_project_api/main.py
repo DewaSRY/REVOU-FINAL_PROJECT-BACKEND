@@ -7,7 +7,7 @@ Returns:
 from http import HTTPStatus
 from dotenv import load_dotenv
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, redirect
 from flask_smorest import Api
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
@@ -73,8 +73,9 @@ def create_app():
     api.register_blueprint(BusinessBluePrint)
     api.register_blueprint(ProductBluePrint)
 
-    @app.route("/")
+    @app.route("/api")
     def index():
-        return app.send_static_file("index.html")
+        # return app.send_static_file("index.html")
+        return redirect("api/swagger-ui")
 
     return app

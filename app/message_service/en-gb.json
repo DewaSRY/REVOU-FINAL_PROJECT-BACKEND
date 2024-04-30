@@ -19,10 +19,35 @@
     "failed_update": "failed to update data from user id : '{}'",
     "duplicate-error": " '{}' already use",
     "not-found": "cannot find user with  {}",
-    "password-not-match": "password doesn't match",
+    "password-not-match": "password doesn't match , {}",
     "account-not-found": "account with  '{}' not found",
     "business-not-found": "business with id '{}' not found",
     "user_id_on_business_not_match": "user id on business id '{}' not match",
     "user_id_on_product_not_match": "user id on product id '{}' not match",
-    "product_not_found": "product with id '{}' not found"
+    "product_not_found": "product with id '{}' not found",
+    "business_not_found": "business with id '{}' not found",
+    "business_typ_not_found": "business type {}",
+    "failed_to_add_business": "failed to add business with business name: {}",
+    "failed_to_update_business": "failed to update business with id '{}'",
+    "failed_to_delete_business": "failed to update business with id '{}'",
+    "password_not_match_example": {
+        "code": 403,
+        "message": "password doesn't match , password:'testing password two' not match with account username : 'usernameTestEight',email: 'usernameTestEight@gamil.com'  ",
+        "status": "Forbidden"
+    },
+    "account_not_found_example": {
+        "code": 404,
+        "message": "account with  'username : 'usernameTestEight two',email: 'usernameTestEightwot@gamil.com'  ' not found",
+        "status": "Not Found"
+    },
+    "account_data_already_user": {
+        "code": 409,
+        "message": " 'usernameTestEight' already use",
+        "status": "Conflict"
+    },
+    "not_image_type_error_example": {
+        "code": 422,
+        "message": "the file sent is not image type",
+        "status": "Unprocessable Entity"
+    }
 }

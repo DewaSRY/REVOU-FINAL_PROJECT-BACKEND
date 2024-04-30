@@ -16,4 +16,4 @@
 - [x] create business view
 - [x] create product view
 
-- []
+- [] image save locale

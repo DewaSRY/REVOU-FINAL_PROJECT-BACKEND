@@ -78,6 +78,19 @@ class AuthData:
     username: str = field(default_factory=str)
     email: str = field(default_factory=str)
 
+    def getCredential(self):
+        if len(self.email) == 0:
+            return f"username: '{self.username}'"
+        elif len(self.username) == 0:
+            return f"email: '{self.email}'"
+        else:
+            return f"username : '{self.username}',email: '{self.email}'  "
+
+    def passwordNotMatchMessage(self):
+        return (
+            f"password:'{self.password}' not match with account {self.getCredential()}"
+        )
+
 
 @dataclass
 class UserUpdateData:

@@ -1,23 +1,34 @@
 """_summary_
 """
 
+from sqlalchemy.sql import func
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import String, Integer, ForeignKey
+from sqlalchemy import String, Integer, ForeignKey, DateTime
 
 from app.model_base_service import db, ModelBaseService
 
-from .business_image_data import BusinessImageData
+from .business_data import BusinessImageData
+from .business_model import BusinessModel
 
 
 class BusinessImageModel(
     BusinessImageData, ModelBaseService["BusinessImageModel"], db.Model
 ):
     __tablename__ = "business_images"
-    public_id = mapped_column("public_id", String(36), primary_key=True)
+    id = mapped_column("id", String(36), primary_key=True)
+    public_id = mapped_column("public_id", String(36))
     secure_url = mapped_column("secure_url", String(50))
     business_id = mapped_column(
         "business_id", String(36), ForeignKey("business.business_id")
     )
+    create_at = mapped_column(
+        "created_at", DateTime(timezone=True), server_default=func.now()
+    )
+
+    @property
+    def business_name(self):
+        bModel: BusinessModel = BusinessModel.get_model_by_id(model_id=self.business_id)
+        return bModel.business_name
 
     def _get_all_model(self):
         return self.session.query(BusinessImageModel).all()
@@ -36,6 +47,18 @@ class BusinessImageModel(
             .filter(BusinessImageModel.business_id == business_id)
             .all()
         )
+
+    @classmethod
+    def put_as_profile(cls, image_id: str) -> BusinessModel:
+
+        imageMode = BusinessModel.get_model_by_id(model_id=image_id)
+        businessModel: BusinessModel = BusinessModel.get_model_by_id(
+            model_id=imageMode.user_id
+        )
+        businessModel.profile_url = imageMode.secure_url
+        cls.session.add(businessModel)
+        cls.session.commit()
+        return businessModel
 
     @classmethod
     def add_model(

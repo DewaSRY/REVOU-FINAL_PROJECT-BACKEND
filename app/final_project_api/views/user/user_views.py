@@ -38,11 +38,113 @@ from .user_schemas import (
 blp = Blueprint(
     "users",
     __name__,
-    url_prefix="/user",
+    url_prefix="/api/user",
     description="""
                 user management end point
                 """,
 )
+
+
+@blp.route("/register")
+class UserRegisterView(MethodView):
+    @blp.arguments(schema=RegisterSchema)
+    @blp.response(status_code=HTTPStatus.CREATED, schema=UserAuthSchema)
+    @blp.alt_response(
+        status_code=HTTPStatus.CONFLICT,
+        description=MessageService.get_message("duplicate-error").format(
+            "data from payload it might be username or email"
+        ),
+        example=MessageService.get_message("account_data_already_user"),
+    )
+    def post(self, user_data: AuthData):
+        """As a user, i can create an account"""
+        userDuplicate: UserModel = UserModel.get_by_email_or_username(
+            username=user_data.username, email=user_data.email
+        )
+        if bool(userDuplicate):
+            duplicate_data: str = (
+                user_data.username
+                if userDuplicate.username == user_data.username
+                else user_data.email
+            )
+            message = MessageService.get_message("duplicate-error").format(
+                duplicate_data
+            )
+            abort(http_status_code=HTTPStatus.CONFLICT, message=message)
+
+        user = UserModel.add_model(
+            email=user_data.email,
+            username=user_data.username,
+            password=user_data.password,
+        )
+        access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
+        return AuthResponseData(user_model=user, access_token=access_token)
+
+
+@blp.route("/login")
+class UserLoginViews(MethodView):
+
+    @blp.arguments(schema=LoginSchemas)
+    @blp.response(schema=UserAuthSchema, status_code=HTTPStatus.OK)
+    @blp.alt_response(
+        status_code=HTTPStatus.NOT_FOUND,
+        description=MessageService.get_message("account-not-found").format(
+            "username or email not found get send"
+        ),
+        example=MessageService.get_message("account_not_found_example"),
+    )
+    @blp.alt_response(
+        status_code=HTTPStatus.FORBIDDEN,
+        description=MessageService.get_message("password-not-match"),
+        example=MessageService.get_message("password_not_match_example"),
+    )
+    def post(self, user_data: AuthData):
+        """As a user, i can login to my registered account"""
+        user: UserModel = UserModel.get_by_email_or_username(
+            username=user_data.username, email=user_data.email
+        )
+        if bool(user) != True:
+            abort(
+                http_status_code=HTTPStatus.NOT_FOUND,
+                message=MessageService.get_message("account-not-found").format(
+                    user_data.getCredential()
+                ),
+            )
+
+        if user.match_password(receive_password=user_data.password) != True:
+            abort(
+                http_status_code=HTTPStatus.FORBIDDEN,
+                message=MessageService.get_message("password-not-match").format(
+                    user_data.passwordNotMatchMessage()
+                ),
+            )
+
+        access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
+        return AuthResponseData(user_model=user, access_token=access_token)
+
+
+@blp.route("/sign-in")
+class UserSignInView(MethodView):
+
+    @jwt_required()
+    @blp.response(status_code=HTTPStatus.OK, schema=UserModelSchema)
+    @blp.alt_response(
+        status_code=HTTPStatus.CONFLICT,
+        description=MessageService.get_message("account-not-found").format(
+            "from jwt token"
+        ),
+    )
+    def get(self):
+        """As a user , i can refresh my data by only provide my access token"""
+        userModel = UserModel.get_model_by_id(model_id=getCurrentAuthId())
+        if bool(userModel) == False:
+            abort(
+                http_status_code=HTTPStatus.CONFLICT,
+                message=MessageService.get_message("account-not-found").format(
+                    getCurrentAuthId()
+                ),
+            )
+        return userModel
 
 
 @blp.route("")
@@ -55,6 +157,7 @@ class UserViews(MethodView):
         description=MessageService.get_message("duplicate-error").format(
             "data from payload"
         ),
+        example=MessageService.get_message("account_data_already_user"),
     )
     @blp.alt_response(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -63,6 +166,7 @@ class UserViews(MethodView):
         ),
     )
     def put(self, user_data: UserUpdateData):
+        """As a user, i can update my data registered data"""
 
         duplicateUse: UserModel = UserModel.get_by_email_or_username(
             username=user_data.username, email=user_data.email
@@ -92,99 +196,6 @@ class UserViews(MethodView):
             )
 
 
-@blp.route("/login")
-class UserLoginViews(MethodView):
-
-    @blp.arguments(schema=LoginSchemas)
-    @blp.response(schema=UserAuthSchema, status_code=HTTPStatus.OK)
-    @blp.alt_response(
-        status_code=HTTPStatus.NOT_FOUND,
-        description=MessageService.get_message("account-not-found").format(
-            "credential get send"
-        ),
-    )
-    def post(self, user_data: AuthData):
-
-        user: UserModel = UserModel.get_by_email_or_username(
-            username=user_data.username, email=user_data.email
-        )
-        if bool(user) != True:
-            abort(
-                http_status_code=HTTPStatus.NOT_FOUND,
-                message=MessageService.get_message("account-not-found").format(
-                    f"username: {user_data.username} "
-                    if len(user_data.username) != 0
-                    else f"email : {user_data.email}"
-                ),
-            )
-
-        if user.match_password(receive_password=user_data.password) != True:
-            abort(
-                http_status_code=HTTPStatus.FORBIDDEN,
-                message=MessageService.get_message("password-not-match"),
-            )
-
-        access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
-        return AuthResponseData(user_model=user, access_token=access_token)
-
-
-@blp.route("/register")
-class UserRegisterView(MethodView):
-    @blp.arguments(schema=RegisterSchema)
-    @blp.response(status_code=HTTPStatus.CREATED, schema=UserAuthSchema)
-    @blp.alt_response(
-        status_code=HTTPStatus.CONFLICT,
-        description=MessageService.get_message("duplicate-error").format(
-            "data from payload"
-        ),
-    )
-    def post(self, user_data: AuthData):
-        userDuplicate: UserModel = UserModel.get_by_email_or_username(
-            username=user_data.username, email=user_data.email
-        )
-        if bool(userDuplicate):
-            duplicate_data: str = (
-                user_data.username
-                if userDuplicate.username == user_data.username
-                else user_data.email
-            )
-            message = MessageService.get_message("duplicate-error").format(
-                duplicate_data
-            )
-            abort(http_status_code=HTTPStatus.CONFLICT, message=message)
-
-        user = UserModel.add_model(
-            email=user_data.email,
-            username=user_data.username,
-            password=user_data.password,
-        )
-        access_token = createAccessToken(user_id=user.id, user_type=user.user_type)
-        return AuthResponseData(user_model=user, access_token=access_token)
-
-
-@blp.route("/sign-in")
-class UserSignInView(MethodView):
-
-    @jwt_required()
-    @blp.response(status_code=HTTPStatus.OK, schema=UserModelSchema)
-    @blp.alt_response(
-        status_code=HTTPStatus.CONFLICT,
-        description=MessageService.get_message("account-not-found").format(
-            "from jwt token"
-        ),
-    )
-    def get(self):
-        userModel = UserModel.get_model_by_id(model_id=getCurrentAuthId())
-        if bool(userModel) == False:
-            abort(
-                http_status_code=HTTPStatus.CONFLICT,
-                message=MessageService.get_message("account-not-found").format(
-                    getCurrentAuthId()
-                ),
-            )
-        return userModel
-
-
 @blp.route("/image")
 class ImageUserViews(MethodView):
 
@@ -194,8 +205,10 @@ class ImageUserViews(MethodView):
     @blp.alt_response(
         status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
         description=MessageService.get_message("file_not_image_type"),
+        example=MessageService.get_message("not_image_type_error_example"),
     )
     def post(self, data: ImagesPayloadData):
+        """as a user, i can post image on the app"""
         image_data: Upload = data.image
         if ImageService.check_extension(image_data=image_data) != True:
             abort(
@@ -219,6 +232,7 @@ class ImageUserViews(MethodView):
         ),
     )
     def get(self):
+        """As a user, i can see all of my image"""
         userModel: UserModel = UserModel.get_model_by_id(model_id=getCurrentAuthId())
         if bool(userModel) == False:
             abort(
@@ -242,6 +256,7 @@ class ImageUserViews(MethodView):
         ),
     )
     def get(self, image_id: str):
+        """As a user, i can get my image by its id"""
         imageMode: UserImageModel = UserImageModel.get_model_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
@@ -259,6 +274,7 @@ class ImageUserViews(MethodView):
         ),
     )
     def delete(self, image_id: str):
+        """As a user, i can delete my image"""
         imageMode: UserImageModel = UserImageModel.get_model_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
@@ -284,6 +300,7 @@ class ImageUserViews(MethodView):
         ),
     )
     def put(self, image_id: str):
+        """As a uer, i can change my profile base on my own store image"""
         imageMode: UserImageModel = UserImageModel.get_model_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(

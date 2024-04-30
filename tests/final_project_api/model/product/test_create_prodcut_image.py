@@ -15,6 +15,8 @@ class TestCreateProductImage(MockDatabaseConnection):
 
     def setup_class(self):
         super().setup_class(self)
+        UserModel.clean_all_model()
+        BusinessModel.clean_all_model()
         self.product_name = "some product name"
         self.product_price = 1_000
         self.product_description = "some description"
@@ -30,6 +32,7 @@ class TestCreateProductImage(MockDatabaseConnection):
             user_id=self.user_create.id,
             business_name="some business name",
             business_type_name=self.business_type.name,
+            description="some business description ",
         )
         self.create_product = ProductModel.add_model(
             business_id=self.business.id,
