@@ -73,7 +73,7 @@ def create_app():
     api.register_blueprint(BusinessBluePrint)
     api.register_blueprint(ProductBluePrint)
 
-    @app.route("/api")
+    @app.route("/")
     def index():
         # return app.send_static_file("index.html")
         return redirect("api/redoc")
