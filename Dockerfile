@@ -38,5 +38,5 @@ RUN poetry install --without dev --no-root
 COPY . /app
 
 # Run Application
-EXPOSE 5000
-CMD [ "poetry", "run",  "flask", "run", "--host=0.0.0.0" ]
+
+CMD ["/bin/bash", "docker-entrypoint.sh"]
