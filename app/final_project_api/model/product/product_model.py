@@ -111,9 +111,11 @@ class ProductModel(ProductData, ModelBaseService["ProductModel"], db.Model):
     def get_all_public_model(cls, query_data: QueryData = QueryData()):
         queryPointer = cls.session.query(ProductModel)
         if len(query_data.search) != 0:
-            return queryPointer.filter(
-                ProductModel.product_name.like(query_data.search)
-            ).all()
+            return (
+                queryPointer.filter(ProductModel.is_delete == False)
+                .filter(ProductModel.product_name.like(query_data.search))
+                .all()
+            )
         offset = (query_data.page - 1) * query_data.limit
         return (
             queryPointer.filter(ProductModel.is_delete == False)

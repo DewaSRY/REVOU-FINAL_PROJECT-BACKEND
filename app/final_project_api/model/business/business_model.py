@@ -137,9 +137,11 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
     def get_all_public_model(cls, query_data: QueryData = QueryData()):
         queryPointer = cls.session.query(BusinessModel)
         if len(query_data.search) != 0:
-            return queryPointer.filter(
-                BusinessModel.business_name.like(query_data.search)
-            ).all()
+            return (
+                queryPointer.filter(BusinessModel.is_delete == False)
+                .filter(BusinessModel.business_name.like(query_data.search))
+                .all()
+            )
         offset = (query_data.page - 1) * query_data.limit
         return (
             queryPointer.filter(BusinessModel.is_delete == False)
