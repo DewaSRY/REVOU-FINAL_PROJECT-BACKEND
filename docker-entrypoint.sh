@@ -1,4 +1,4 @@
 #!/bin/sh
 
 
-exec poetry run waitress-serve --host 0.0.0.0 --call app:create_app
+exec poetry run waitress-serve --host 0.0.0.0 --port=8080 --call app:create_app
