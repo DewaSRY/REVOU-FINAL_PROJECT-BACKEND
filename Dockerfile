@@ -39,4 +39,4 @@ COPY . /app
 
 # Run Application
 
-CMD ["/bin/bash", "docker-entrypoint.sh"]
+CMD ["/bin/bash", "script/docker-entrypoint.sh"]

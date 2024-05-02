@@ -1,22 +1,62 @@
+[![Build Status](https://travis-ci.org/ssfdust/full-stack-flask-smorest.svg?branch=master)](https://travis-ci.org/ssfdust/full-stack-flask-smorest)
+[![Coverage Status](https://coveralls.io/repos/github/ssfdust/full-stack-flask-smorest/badge.svg?branch=master)](https://coveralls.io/github/ssfdust/full-stack-flask-smorest?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/aa3d7d986faf4e22969c56be5ea3d54d)](https://www.codacy.com/manual/ssfdust/full-stack-flask-smorest?utm_source=github.com&utm_medium=referral&utm_content=ssfdust/full-stack-flask-smorest&utm_campaign=Badge_Grade)
+[![Python Versions](https://img.shields.io/badge/python-3.11%20|%203.12-0366d6)](https://www.python.org)
+
 # Final Project BACKEND
 
-- Libraries Use
+create by : Dewa Surya Ariesta
 
-### Libraries use
+hosting :[hosting on railway ](https://revou-finalproject-backend-production.up.railway.app/)
 
-```bash
-poetry add flask flask-smorest python-dotenv sqlalchemy flask-sqlalchemy marshmallow flask_migrate flask_jwt_extended passlib
+## environment variable needed
+
+- `CLOUDINARY_URL`
+
+  get the `CLOUDINARY_URL` from cloudinary
+  ![cloudinary_dashboard](/screenshots/clodinary_dashboard.png)
+
+- `FLASK_DEBUG` just put `FLASK_DEBUG= True` so the app run on development mode
+
+## run the project
+
+1. `poetry install` # install the dependency
+
+2. `poetry run flask run` or `script/flask_run.bat` for windows # run the app
+3. `poetry run pytest -s` or `script/test.bat` for windows # test the app
+4. `poetry show --tree` # show all dependency use on this app
+
+## Api document appearance
+
+- Default document use [redocj](https://github.com/Redocly/redoc)
+
+![image](/screenshots/api_document.png)
+
+- Another document write by rapidcoc [final_project_rapidoc](https://revou-finalproject-backend-production.up.railway.app/api/rapidoc)
+
+![image_rapidoc](/screenshots/rapidoc_document.png)
+
+## folder structure
+
+```txt
+app
+   |-- __init__.py
+   |-- database_connector
+   |-- datetime_service
+   |-- final_project_api        # the app logic get mapped
+   |   |-- main.py
+   |   |-- model
+   |   |   |-- business
+   |   |   |-- product
+   |   |   |-- user
+   |   |-- util
+   |   |   |-- query_data.py
+   |   |-- views                # every views have they own schema and views
+   |   |   |-- business
+   |   |   |-- product
+   |   |   |-- user
+   |-- image_upload_service
+   |-- jwt_service
+   |-- message_service
+   |-- model_base_service
 ```
-
-- flask
-- flask-smorest
-- flask-sqlalchemy
-- flask_migrate
-- flask_jwt_extended
-- flask_cors
-- flask_uploads
-
-- marshmallow
-- python-dotenv
-- passlib
-- cloudinary
