@@ -1,4 +1,4 @@
-FROM python:3.12.3-slim-bullseye as python-base
+FROM python:3.12-slim  as python-base
 
 # https://python-poetry.org/docs#ci-recommendations
 ENV POETRY_VERSION=1.8
@@ -33,7 +33,7 @@ COPY poetry.lock pyproject.toml ./
 # [OPTIONAL] Validate the project is properly configured
 
 # Install Dependencies
-RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
+RUN poetry install --without dev --no-root 
 # Copy Application
 COPY . /app
 
