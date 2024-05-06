@@ -5,9 +5,9 @@
 
 - [x] learn about cors origin
 
-- [] explain about project at readme
-- [] explain lib use on project at readme
-- [] explain structure project at readme
+- [x] explain about project at readme
+- [x] explain lib use on project at readme
+- [x] explain structure project at readme
 
 - [x] finishes project
 
@@ -17,3 +17,5 @@
 - [x] create product view
 
 - [-] image save locale
+
+- [] mkdocs [mkdoc_site](https://www.mkdocs.org/getting-started/)

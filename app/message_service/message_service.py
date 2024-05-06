@@ -12,10 +12,11 @@ class MessageService:
     base_dir = basedir = path.join(getcwd(), "app", "message_service")
     default_locale = "en-gb"
     cached_strings = {}
+    massage_json_phat = f"{base_dir}/{default_locale}.json"
 
     @classmethod
     def refresh(cls):
-        with open(f"{cls.base_dir}/{cls.default_locale}.json") as f:
+        with open(cls.massage_json_phat) as f:
             cls.cached_strings = json.load(f)
 
     @classmethod

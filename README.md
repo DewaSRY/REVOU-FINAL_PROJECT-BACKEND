@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/ssfdust/full-stack-flask-smorest.svg?branch=master)](https://travis-ci.org/ssfdust/full-stack-flask-smorest)
-[![Coverage Status](https://coveralls.io/repos/github/ssfdust/full-stack-flask-smorest/badge.svg?branch=master)](https://coveralls.io/github/ssfdust/full-stack-flask-smorest?branch=master)
+[![Coverage Status](https://s3.amazonaws.com/assets.coveralls.io/badges/coveralls_81.svg)](https://coveralls.io/github/ssfdust/full-stack-flask-smorest?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/aa3d7d986faf4e22969c56be5ea3d54d)](https://www.codacy.com/manual/ssfdust/full-stack-flask-smorest?utm_source=github.com&utm_medium=referral&utm_content=ssfdust/full-stack-flask-smorest&utm_campaign=Badge_Grade)
 [![Python Versions](https://img.shields.io/badge/python-3.11%20|%203.12-0366d6)](https://www.python.org)
 
@@ -24,7 +24,8 @@ hosting :[hosting on railway ](https://revou-finalproject-backend-production.up.
 
 2. `poetry run flask run` or `script/flask_run.bat` for windows # run the app
 3. `poetry run pytest -s` or `script/test.bat` for windows # test the app
-4. `poetry show --tree` # show all dependency use on this app
+4. `poetry run pytest --cov` or `script/cov.bat` for windows # see test coverage
+5. `poetry show --tree` # show all dependency use on this app
 
 ## Api document appearance
 

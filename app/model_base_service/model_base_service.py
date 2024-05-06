@@ -8,37 +8,21 @@ from .model_base import ModelBase
 from typing import Iterable
 from typing import Union
 from sqlalchemy.orm.session import Session
+from typing import Self
 
 
-class ModelBaseService[T](ModelBase):
-    """ModelBaseService
-    will provide several class method can help to work with the data base
-    """
-
+class ModelBaseService(ModelBase):
     session: Session = db.session
 
     def _delete(self):
-        """_delete
-        it s will be default method
-        """
         self.session.delete(self)
 
     @classmethod
-    def set_session(cls, session: Session) -> None:
-        """set_session
-        Args:
-            session (SESSION_TYPE): _description_
-        """
+    def setSession(cls, session: Session) -> None:
         cls.session = session
 
     @classmethod
-    def add_model(cls, model: T) -> T:
-        """add_model
-        Args:
-            model (T):T
-        Returns:
-            return T
-        """
+    def add(cls, model: Self) -> Self:
         try:
             cls.session.add(model)
             cls.session.commit()
@@ -47,26 +31,11 @@ class ModelBaseService[T](ModelBase):
             raise Exception(f"{cls.__call__} failed to add model")
 
     @classmethod
-    def get_model_by_id(cls, model_id: Union[str, int]):
-        return cls._get_model_by_id(cls, model_id=model_id)
+    def getById(cls, model_id: Union[str, int]):
+        return cls._getById(cls, model_id=model_id)
 
     @classmethod
-    def add_all_model(cls, list_model: Iterable[T]) -> list[T]:
-        try:
-            cls.session.add_all(instances=list_model)
-            cls.session.commit()
-            return list_model
-        except Exception as e:
-            raise Exception(f"{cls.__class__} failed to add_all_model")
-
-    @classmethod
-    def update_model(cls, model: T, **args) -> T:
-        """_summary_
-        Args:
-            model (T): _description_
-        Returns:
-            T: _description_
-        """
+    def update(cls, model: Self, **args) -> Self:
         try:
             model._update(**args)
             cls.session.add(model)
@@ -76,7 +45,7 @@ class ModelBaseService[T](ModelBase):
             raise e
 
     @classmethod
-    def delete_model(cls, model: T) -> "ModelBaseService":
+    def delete(cls, model: Self) -> "ModelBaseService":
         try:
             model._delete()
             cls.session.commit()
@@ -85,34 +54,23 @@ class ModelBaseService[T](ModelBase):
             raise e
 
     @classmethod
-    def update_with_id(cls, model_id: Union[str, int], **args):
-        """update_with_id
-        Args:
-            model_id (Union[str, int]): _description_
-        """
-        model: T = cls._get_model_by_id(cls, model_id=model_id)
-        cls.update_model(model=model, **args)
+    def updateWithId(cls, model_id: Union[str, int], **args):
+        model: Self = cls._getById(cls, model_id=model_id)
+        cls.update(model=model, **args)
         return model
 
     @classmethod
-    def delete_model_with_id(cls, model_id: Union[str, int]):
-        """delete_model_with_id
-        Args:
-            model_id (Union[str, int]): _description_
-        """
-        model: T = cls._get_model_by_id(cls, model_id=model_id)
-        cls.delete_model(model=model)
+    def deleteModelWithId(cls, model_id: Union[str, int]):
+        model: Self = cls._getById(cls, model_id=model_id)
+        cls.delete(model=model)
 
     @classmethod
-    def get_all_model(cls: "ModelBaseService") -> list["ModelBaseService"]:
-        return cls._get_all_model(cls)
+    def get_all_model(cls: Self) -> list[Self]:
+        return cls._getAll(cls)
 
     @classmethod
-    def clean_all_model(cls):
-        """clean_all_model
-        use to delete all model
-        """
-        all_model_to_clean: list[ModelBase] = cls._get_all_model(cls)
+    def cleanAll(cls):
+        all_model_to_clean: list[Self] = cls._getAll(cls)
         for model in all_model_to_clean:
             model._delete()
             cls.session.commit()
