@@ -2,10 +2,9 @@
 """
 
 from tests.mock_database_connection import MockDatabaseConnection
-from app.final_project_api.model.user import (
-    UserTypeModel,
-    UserModel,
-)
+from app.final_project_api.user_module.model import UserModel
+from app.final_project_api.user_module.type_model import UserTypeModel
+from app.final_project_api.user_module.image_model import UserImageModel
 from pprint import pprint
 from unittest import skip
 from uuid import uuid4
@@ -14,7 +13,7 @@ from uuid import uuid4
 class TestCreateUser(MockDatabaseConnection):
     def setup_class(self):
         super().setup_class(self)
-        UserTypeModel.clean_all_model()
+        UserTypeModel.clean_all()
         self.user_name = "some name another one"
         self.user_email = "some email another email"
         self.user_password = "some password"
@@ -30,8 +29,8 @@ class TestCreateUser(MockDatabaseConnection):
         self.type_user = UserTypeModel.add_model(name="some type")
 
     def tearDown(self) -> None:
-        UserModel.clean_all_model()
-        UserTypeModel.clean_all_model()
+        UserModel.clean_all()
+        UserTypeModel.clean_all()
 
     # @skip("just skip")
     def test_create_user(self):

@@ -14,9 +14,12 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS, cross_origin
 
 
-from .views import BusinessBluePrint, ProductBluePrint, UserBluePrint
-from .model.user import UserTypeModel
-from .model.business import BusinessTypeModel
+from .user_module.views import blp as UserBluePrint
+from .product_module.views import blp as ProductBluePrint
+from .business_module.views import blp as BusinessBluePrint
+
+from .user_module.type_model import UserTypeModel
+from .business_module.type_model import BusinessTypeModel
 
 from app.model_base_service import db
 from app.jwt_service import JWTData

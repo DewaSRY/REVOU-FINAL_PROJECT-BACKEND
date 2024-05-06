@@ -2,19 +2,15 @@
 """
 
 from marshmallow import Schema, fields, post_load
-from app.final_project_api.views.business.business_schemas import BusinessSchemas
-from app.final_project_api.views.product.product_schemas import ProductSchema
+from app.final_project_api.business_module.schema import BusinessSchemas
+from app.final_project_api.product_module.schema import ProductSchema
 
-from app.final_project_api.model.user import AuthData, UserUpdateData
+from .data import AuthData, UserUpdateData
 from app.image_upload_service import ImageModelSchema
 
 
 class UserImageModelSchema(ImageModelSchema):
     username = fields.String()
-
-
-# class QueryUpdateProfile(Schema):
-#     pubic_id = fields.Str()
 
 
 class UserWithImagesSchema(Schema):

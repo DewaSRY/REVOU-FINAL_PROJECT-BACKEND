@@ -7,11 +7,11 @@ from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey, String, Boolean, DateTime
 from app.model_base_service import db, ModelBaseService
 from app.message_service import MessageService
-from app.final_project_api.util import QueryData, QuerySchema
+from app.util import QueryData, QuerySchema
 from datetime import datetime
 
 
-class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
+class BusinessModel(BusinessDate, ModelBaseService, db.Model):
     __tablename__ = "business"
     id = mapped_column("business_id", String(36), primary_key=True)
     user_id = mapped_column("user_id", String(36), ForeignKey("user.user_id"))
@@ -33,14 +33,14 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
     def business_images(self):
         from .image_model import BusinessImageModel
 
-        imagesList = BusinessImageModel.get_image_by_business_id(self.id)
+        imagesList = BusinessImageModel.get_by_business_id(self.id)
         if len(imagesList) == 0:
             return []
         return imagesList
 
     @property
     def product(self):
-        from app.final_project_api.model.product import ProductModel as PM
+        from app.final_project_api.product_module.model import ProductModel as PM
 
         return PM.get_by_business_id(business_id=self.id)
 
@@ -48,26 +48,26 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
     def business_types(self):
         from .type_model import BusinessTypeModel as BTM
 
-        model: BTM = BTM.get_model_by_id(model_id=self.business_type_id)
+        model: BTM = BTM.get_by_id(model_id=self.business_type_id)
         return model.name
 
     @property
     def user_phone_number(self):
-        from app.final_project_api.model.user import UserModel
+        from app.final_project_api.user_module.model import UserModel
 
-        return UserModel.get_model_by_id(model_id=self.user_id).phone_number
+        return UserModel.get_by_id(model_id=self.user_id).phone_number
 
     @property
     def username(self):
-        from app.final_project_api.model.user import UserModel
+        from app.final_project_api.user_module.model import UserModel
 
-        return UserModel.get_model_by_id(model_id=self.user_id).username
+        return UserModel.get_by_id(model_id=self.user_id).username
 
     @property
     def user_email(self):
-        from app.final_project_api.model.user import UserModel
+        from app.final_project_api.user_module.model import UserModel
 
-        return UserModel.get_model_by_id(model_id=self.user_id).email
+        return UserModel.get_by_id(model_id=self.user_id).email
 
     def _update(
         self,
@@ -95,10 +95,10 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
             raise Exception(message)
         self.business_type_id = businessType.id
 
-    def _get_all_model(self):
+    def _get_all(self):
         return self.session.query(BusinessModel).all()
 
-    def _get_model_by_id(self, model_id: str) -> "BusinessModel":
+    def _get_by_id(self, model_id: str) -> "BusinessModel":
         return (
             self.session.query(BusinessModel)
             .filter(BusinessModel.id == model_id)
@@ -107,9 +107,9 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
 
     @classmethod
     def delete_by_id(cls, model_id: str):
-        from app.final_project_api.model.product import ProductModel
+        from app.final_project_api.product_module.model import ProductModel
 
-        businessModel: BusinessModel = BusinessModel.get_model_by_id(model_id=model_id)
+        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=model_id)
         businessModel.is_delete = True
         productList: list[ProductModel] = businessModel.product
         for product in productList:
@@ -121,9 +121,7 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
 
     @classmethod
     def update_by_id(cls, business_id: str, update_data: BusinessCreateData):
-        businessModel: BusinessModel = BusinessModel.get_model_by_id(
-            model_id=business_id
-        )
+        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
         businessModel._update(
             business_name=update_data.business_name,
             business_type_name=update_data.business_types,
@@ -134,7 +132,7 @@ class BusinessModel(BusinessDate, ModelBaseService["BusinessModel"], db.Model):
         return businessModel
 
     @classmethod
-    def get_all_public_model(cls, query_data: QueryData = QueryData()):
+    def get_all_public(cls, query_data: QueryData = QueryData()):
         queryPointer = cls.session.query(BusinessModel)
         if len(query_data.search) != 0:
             return (

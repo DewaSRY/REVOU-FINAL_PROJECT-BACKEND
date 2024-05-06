@@ -3,7 +3,7 @@
 
 from dataclasses import dataclass, field
 from app.model_base_service import DataBaseDefault
-from app.final_project_api.model.product import ProductData
+from app.final_project_api.product_module.data import ProductData
 from app.image_upload_service import ImageData
 
 
@@ -27,18 +27,6 @@ class BusinessTypeData:
 
 @dataclass(kw_only=True)
 class BusinessDate(DataBaseDefault):
-    """BusinessDate
-    str user_id
-    str business_name
-    str description
-    str business_type_id
-    BusinessImageData[] business_images
-    ProductData product
-    str profile_url
-    str user_phone_number
-    str user_email
-    """
-
     user_id: str
     business_name: str
     business_types: str = field(init=False, compare=False)
@@ -75,12 +63,6 @@ class BusinessDate(DataBaseDefault):
 
 @dataclass
 class BusinessCreateData:
-    """BusinessCreateData
-    str business_name
-    str business_types
-    str description
-    """
-
     business_name: str = field(default_factory=str)
     business_types: str = field(default_factory=str)
     description: str = field(default_factory=str)

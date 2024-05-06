@@ -3,9 +3,11 @@
 
 from tests.mock_database_connection import MockDatabaseConnection
 
-from app.final_project_api.model.user import UserModel
-from app.final_project_api.model.business import BusinessModel, BusinessTypeModel
-from app.final_project_api.model.product import ProductModel, ProductImageModel
+from app.final_project_api.user_module.model import UserModel
+from app.final_project_api.business_module.model import BusinessModel
+from app.final_project_api.business_module.type_model import BusinessTypeModel
+from app.final_project_api.product_module.model import ProductModel
+from app.final_project_api.product_module.image_model import ProductImageModel
 from pprint import pprint
 from unittest import skip
 from uuid import uuid4
@@ -15,8 +17,8 @@ class TestUpdateImage(MockDatabaseConnection):
 
     def setup_class(self):
         super().setup_class(self)
-        UserModel.clean_all_model()
-        BusinessModel.clean_all_model()
+        UserModel.clean_all()
+        BusinessModel.clean_all()
         self.product_name = "some product name"
         self.product_price = 1_000
         self.product_description = "some description"
@@ -42,11 +44,11 @@ class TestUpdateImage(MockDatabaseConnection):
         )
 
     def tearDown(self) -> None:
-        UserModel.clean_all_model()
-        BusinessTypeModel.clean_all_model()
-        BusinessModel.clean_all_model()
-        ProductImageModel.clean_all_model()
-        ProductModel.clean_all_model()
+        UserModel.clean_all()
+        BusinessTypeModel.clean_all()
+        BusinessModel.clean_all()
+        ProductImageModel.clean_all()
+        ProductModel.clean_all()
 
     def test_create_product_image(self):
         first_url = "first ulr"

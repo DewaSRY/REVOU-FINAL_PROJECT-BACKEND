@@ -9,9 +9,10 @@ from flask.views import MethodView
 from flask_smorest.fields import Upload
 from flask_jwt_extended import jwt_required
 
-from app.final_project_api.model.user import (
-    UserModel,
-    UserImageModel,
+
+from .model import UserModel
+from .image_model import UserImageModel
+from .data import (
     AuthData,
     UserUpdateData,
     AuthResponseData,
@@ -134,7 +135,7 @@ class UserSignInView(MethodView):
     )
     def get(self):
         """As a user , i can refresh my data by only provide my access token"""
-        userModel = UserModel.get_model_by_id(model_id=getCurrentAuthId())
+        userModel = UserModel.get_by_id(model_id=getCurrentAuthId())
         if bool(userModel) == False:
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
@@ -231,7 +232,7 @@ class ImageUserViews(MethodView):
     )
     def get(self):
         """As a user, i can see all of my image"""
-        userModel: UserModel = UserModel.get_model_by_id(model_id=getCurrentAuthId())
+        userModel: UserModel = UserModel.get_by_id(model_id=getCurrentAuthId())
         if bool(userModel) == False:
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
@@ -255,13 +256,13 @@ class ImageUserViews(MethodView):
     )
     def get(self, image_id: str):
         """As a user, i can get my image by its id"""
-        imageMode: UserImageModel = UserImageModel.get_model_by_id(model_id=image_id)
+        imageMode: UserImageModel = UserImageModel.get_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,
                 message=MessageService.get_message("image_not_found").format(image_id),
             )
-        return UserImageModel.get_model_by_id(model_id=image_id)
+        return UserImageModel.get_by_id(model_id=image_id)
 
     @jwt_required()
     @blp.response(status_code=HTTPStatus.ACCEPTED)
@@ -273,7 +274,7 @@ class ImageUserViews(MethodView):
     )
     def delete(self, image_id: str):
         """As a user, i can delete my image"""
-        imageMode: UserImageModel = UserImageModel.get_model_by_id(model_id=image_id)
+        imageMode: UserImageModel = UserImageModel.get_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,
@@ -299,7 +300,7 @@ class ImageUserViews(MethodView):
     )
     def put(self, image_id: str):
         """As a uer, i can change my profile base on my own store image"""
-        imageMode: UserImageModel = UserImageModel.get_model_by_id(model_id=image_id)
+        imageMode: UserImageModel = UserImageModel.get_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,

@@ -2,11 +2,9 @@
 """
 
 from tests.mock_database_connection import MockDatabaseConnection
-from app.final_project_api.model.user import (
-    UserTypeModel,
-    UserImageModel,
-    UserModel,
-)
+from app.final_project_api.user_module.model import UserModel
+from app.final_project_api.user_module.type_model import UserTypeModel
+from app.final_project_api.user_module.image_model import UserImageModel
 from pprint import pprint
 from unittest import skip
 from uuid import uuid4
@@ -15,10 +13,10 @@ from uuid import uuid4
 class TestCreateUserImage(MockDatabaseConnection):
     def setup_class(self):
         super().setup_class(self)
-        UserTypeModel.clean_all_model()
-        UserModel.clean_all_model()
-        UserTypeModel.clean_all_model()
-        UserImageModel.clean_all_model()
+        UserTypeModel.clean_all()
+        UserModel.clean_all()
+        UserTypeModel.clean_all()
+        UserImageModel.clean_all()
 
     def setUp(self) -> None:
         self.type_user = UserTypeModel.add_model(name="some type")
@@ -29,9 +27,9 @@ class TestCreateUserImage(MockDatabaseConnection):
         )
 
     def tearDown(self) -> None:
-        UserModel.clean_all_model()
-        UserTypeModel.clean_all_model()
-        UserImageModel.clean_all_model()
+        UserModel.clean_all()
+        UserTypeModel.clean_all()
+        UserImageModel.clean_all()
 
     def test_put_image_as_profile(self):
         img_secure_url = "some secure Url"
@@ -87,7 +85,7 @@ class TestCreateUserImage(MockDatabaseConnection):
             secure_url=img_secure_url,
             public_id=img_public_id,
         )
-        get_image = UserImageModel.get_model_by_id(model_id=create_image.id)
+        get_image = UserImageModel.get_by_id(model_id=create_image.id)
         assert create_image == get_image
 
     def test_delete_user_image(self):
@@ -100,7 +98,7 @@ class TestCreateUserImage(MockDatabaseConnection):
         )
         image_id = create_image.id
         imageDelete = UserImageModel.delete_model_by_id(model_id=image_id)
-        get_image = UserImageModel.get_model_by_id(model_id=image_id)
+        get_image = UserImageModel.get_by_id(model_id=image_id)
 
         assert create_image == imageDelete
         assert create_image != get_image

@@ -9,7 +9,7 @@ from sqlalchemy.sql import func
 from sqlalchemy import String, DateTime, Integer, ForeignKey, Float, Boolean
 
 from .data import ProductData, ProductUpdateData
-from app.final_project_api.util import QueryData
+from app.util import QueryData
 from app.model_base_service import db, ModelBaseService
 
 
@@ -35,16 +35,16 @@ class ProductModel(ProductData, ModelBaseService, db.Model):
 
     @property
     def business_name(self):
-        from app.final_project_api.model.business import BusinessModel
+        from app.final_project_api.business_module.model import BusinessModel
 
-        model: BusinessModel = BusinessModel.get_model_by_id(model_id=self.business_id)
+        model: BusinessModel = BusinessModel.get_by_id(model_id=self.business_id)
         return model.business_name
 
     @property
     def username(self):
-        from app.final_project_api.model.user import UserModel
+        from app.final_project_api.user_module.model import UserModel
 
-        model: UserModel = UserModel.get_model_by_id(model_id=self.user_id)
+        model: UserModel = UserModel.get_by_id(model_id=self.user_id)
         return model.username
 
     @property
@@ -56,34 +56,9 @@ class ProductModel(ProductData, ModelBaseService, db.Model):
             return []
         return imageList
 
-    def _set_user_id(self):
-        from app.final_project_api.model.business import BusinessModel as BM
-
-        model: BM = BM.get_model_by_id(model_id=self.business_id)
-        self.user_id = model.user_id
-
-    def _get_all_model(self):
-        return self.session.query(ProductModel).all()
-
-    def _get_model_by_id(self, model_id: str):
-        return self.session.query(ProductModel).filter(ProductModel.id == model_id)
-
-    def _update(
-        self,
-        product_name: str = "",
-        product_price: float = 0,
-        description: str = "",
-    ):
-        if product_price != self.product_price:
-            self.product_price = product_price
-        if len(product_name) != 0:
-            self.product_name = product_name
-        if len(description) != 0:
-            self.description = description
-
     @classmethod
     def delete_model_by_id(cls, model_id: str):
-        productModel: ProductModel = ProductModel.get_model_by_id(model_id=model_id)
+        productModel: ProductModel = ProductModel.get_by_id(model_id=model_id)
         productModel.is_delete = True
         cls.session.add(productModel)
         cls.session.commit()
@@ -91,7 +66,7 @@ class ProductModel(ProductData, ModelBaseService, db.Model):
 
     @classmethod
     def update_with_update_data(cls, product_id: str, product_data: ProductUpdateData):
-        productModel: Self = ProductModel.get_model_by_id(model_id=product_id)
+        productModel: Self = ProductModel.get_by_id(model_id=product_id)
         productModel._update(
             product_name=product_data.product_name,
             description=product_data.description,
@@ -102,13 +77,13 @@ class ProductModel(ProductData, ModelBaseService, db.Model):
         return productModel
 
     @classmethod
-    def get_model_by_id(cls, model_id: str):
+    def get_by_id(cls, model_id: str):
         return (
             cls.session.query(ProductModel).filter(ProductModel.id == model_id).first()
         )
 
     @classmethod
-    def get_all_public_model(cls, query_data: QueryData = QueryData()):
+    def get_all_public(cls, query_data: QueryData = QueryData()):
         queryPointer = cls.session.query(ProductModel)
         if len(query_data.search) != 0:
             return (
@@ -153,3 +128,28 @@ class ProductModel(ProductData, ModelBaseService, db.Model):
             .filter(ProductModel.business_id == business_id)
             .all()
         )
+
+    def _set_user_id(self):
+        from app.final_project_api.business_module.model import BusinessModel as BM
+
+        model: BM = BM.get_by_id(model_id=self.business_id)
+        self.user_id = model.user_id
+
+    def _get_all(self):
+        return self.session.query(ProductModel).all()
+
+    def _get_by_id(self, model_id: str):
+        return self.session.query(ProductModel).filter(ProductModel.id == model_id)
+
+    def _update(
+        self,
+        product_name: str = "",
+        product_price: float = 0,
+        description: str = "",
+    ):
+        if product_price != self.product_price:
+            self.product_price = product_price
+        if len(product_name) != 0:
+            self.product_name = product_name
+        if len(description) != 0:
+            self.description = description

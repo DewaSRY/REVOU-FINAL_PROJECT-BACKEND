@@ -17,20 +17,14 @@ from app.image_upload_service import (
 from app.jwt_service import getCurrentAuthId
 from app.message_service import MessageService
 
-from app.final_project_api.model.product import (
-    ProductData,
-    ProductImageData,
-    ProductImageModel,
-    ProductModel,
-    ProductCreateData,
-    ProductUpdateData,
-)
-from app.final_project_api.model.business import BusinessModel
-from app.final_project_api.model.user import UserModel
-from app.final_project_api.util import QuerySchema, QueryData
+from .data import ProductCreateData
+from .image_model import ProductImageModel
+from .model import ProductModel, ProductUpdateData
+from app.final_project_api.business_module.model import BusinessModel
+from app.final_project_api.user_module.model import UserModel
+from app.util import QuerySchema, QueryData
 
 from .schema import (
-    ProductSchema,
     ProductModelSchema,
     ProductPublicSchemas,
     ProductCreateSchema,
@@ -48,14 +42,14 @@ blp = Blueprint(
 )
 
 
-@blp.route("/")
+@blp.route("")
 class ProductViews(MethodView):
 
     @blp.arguments(schema=QuerySchema, location="query")
     @blp.response(schema=ProductPublicSchemas(many=True), status_code=HTTPStatus.OK)
     def get(self, query_data: QueryData):
         """As a user, i can get all product event without access token"""
-        return ProductModel.get_all_public_model(query_data=query_data)
+        return ProductModel.get_all_public(query_data=query_data)
 
     @jwt_required()
     @blp.arguments(schema=ProductCreateSchema)
@@ -74,7 +68,7 @@ class ProductViews(MethodView):
     )
     def post(self, product_data: ProductCreateData):
         """As a user, i can create product"""
-        businessModel: BusinessModel = BusinessModel.get_model_by_id(
+        businessModel: BusinessModel = BusinessModel.get_by_id(
             model_id=product_data.business_id
         )
         if bool(businessModel) == False or businessModel.user_id != getCurrentAuthId():
@@ -115,7 +109,7 @@ class ProductByIdViews(MethodView):
     @jwt_required()
     def get(self, product_id: str):
         """as a user i can get my product by its id"""
-        productModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
+        productModel: ProductModel = ProductModel.get_by_id(model_id=product_id)
         if bool(productModel) == False or (
             productModel.delete_model == True
             or productModel.user_id != getCurrentAuthId()
@@ -140,7 +134,7 @@ class ProductByIdViews(MethodView):
     )
     def put(self, product_data: ProductUpdateData, product_id: str):
         """As a user,i can update my product by its id"""
-        productModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
+        productModel: ProductModel = ProductModel.get_by_id(model_id=product_id)
         if productModel.user_id != getCurrentAuthId():
             abort(
                 http_status_code=HTTPStatus.NOT_ACCEPTABLE,
@@ -184,7 +178,6 @@ class ProductByIdViews(MethodView):
             )
 
 
-# TODO: handle product  image
 @blp.route("/image/<string:product_id>")
 class ImageUserViews(MethodView):
 
@@ -225,7 +218,7 @@ class ImageUserViews(MethodView):
     )
     def get(self, product_id: str):
         """As a user, i can get image by its id"""
-        userModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
+        userModel: ProductModel = ProductModel.get_by_id(model_id=product_id)
         if bool(userModel) == False:
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
@@ -249,15 +242,13 @@ class ImageUserViews(MethodView):
     )
     def get(self, image_id: str):
         """As a user, i can get image by its id"""
-        imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
-            model_id=image_id
-        )
+        imageMode: ProductImageModel = ProductImageModel.get_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,
                 message=MessageService.get_message("image_not_found").format(image_id),
             )
-        return ProductImageModel.get_model_by_id(model_id=image_id)
+        return ProductImageModel.get_by_id(model_id=image_id)
 
     @jwt_required()
     @blp.response(status_code=HTTPStatus.ACCEPTED)
@@ -269,9 +260,7 @@ class ImageUserViews(MethodView):
     )
     def delete(self, image_id: str):
         """As a user, i can delete image by its id"""
-        imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
-            model_id=image_id
-        )
+        imageMode: ProductImageModel = ProductImageModel.get_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,
@@ -297,9 +286,7 @@ class ImageUserViews(MethodView):
     )
     def put(self, image_id: str):
         """As a user i can put image by its id to the product profile"""
-        imageMode: ProductImageModel = ProductImageModel.get_model_by_id(
-            model_id=image_id
-        )
+        imageMode: ProductImageModel = ProductImageModel.get_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,

@@ -8,13 +8,10 @@ from flask.views import MethodView
 from flask_jwt_extended import jwt_required
 from flask_smorest.fields import Upload
 
-from app.final_project_api.model.business import (
-    BusinessImageData,
-    BusinessImageModel,
-    BusinessTypeData,
-    BusinessTypeModel,
-    BusinessModel,
-)
+
+from .type_model import BusinessTypeModel
+from .model import BusinessModel
+from .image_model import BusinessImageModel
 from app.image_upload_service import (
     ImageService,
     ImageSchema,
@@ -26,7 +23,6 @@ from app.message_service import MessageService
 from .schema import (
     BusinessModelSchema,
     BusinessCreateSchema,
-    BusinessSchemas,
     BusinessCreateData,
     BusinessUpdateSchema,
     BusinessWithImageModel,
@@ -34,7 +30,7 @@ from .schema import (
     BusinessPublicSchema,
 )
 
-from app.final_project_api.util import QueryData, QuerySchema
+from app.util import QueryData, QuerySchema
 from pprint import pprint
 
 blp = Blueprint(
@@ -51,7 +47,7 @@ class BusinessViews(MethodView):
     @blp.response(schema=BusinessPublicSchema(many=True), status_code=HTTPStatus.OK)
     def get(self, query_data: QueryData):
         """As a user, i can get all business public data without auth"""
-        return BusinessModel.get_all_public_model(query_data=query_data)
+        return BusinessModel.get_all_public(query_data=query_data)
 
     @jwt_required()
     @blp.arguments(schema=BusinessCreateSchema)
@@ -96,9 +92,7 @@ class BusinessByIdViews(MethodView):
     )
     def get(self, business_id: str):
         """As a user i can get business detail by it's id"""
-        businessModel: BusinessModel = BusinessModel.get_model_by_id(
-            model_id=business_id
-        )
+        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
         if (
             bool(businessModel) == False
             or businessModel.is_delete == True
@@ -129,9 +123,7 @@ class BusinessByIdViews(MethodView):
     )
     def put(self, business_data: BusinessCreateData, business_id: str):
         """As a user i can update my own business data"""
-        businessModel: BusinessModel = BusinessModel.get_model_by_id(
-            model_id=business_id
-        )
+        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
         if businessModel.user_id != getCurrentAuthId():
             abort(
                 http_status_code=HTTPStatus.FORBIDDEN,
@@ -167,9 +159,7 @@ class BusinessByIdViews(MethodView):
     )
     def delete(self, business_id: str):
         """As a user i, can delete my own business"""
-        businessModel: BusinessModel = BusinessModel.get_model_by_id(
-            model_id=business_id
-        )
+        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
         if businessModel.user_id != getCurrentAuthId():
             abort(
                 http_status_code=HTTPStatus.FORBIDDEN,
@@ -230,7 +220,7 @@ class ImageUserViews(MethodView):
     )
     def get(self, business_id: str):
         """As a user, i can see all of my image"""
-        userModel: BusinessModel = BusinessModel.get_model_by_id(model_id=business_id)
+        userModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
         if bool(userModel) == False:
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
@@ -255,15 +245,13 @@ class ImageUserViews(MethodView):
     )
     def get(self, image_id: str):
         """As a user, i can see my image by its id"""
-        imageMode: BusinessImageModel = BusinessImageModel.get_model_by_id(
-            model_id=image_id
-        )
+        imageMode: BusinessImageModel = BusinessImageModel.get_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,
                 message=MessageService.get_message("image_not_found").format(image_id),
             )
-        return BusinessImageModel.get_model_by_id(model_id=image_id)
+        return BusinessImageModel.get_by_id(model_id=image_id)
 
     @jwt_required()
     @blp.response(status_code=HTTPStatus.ACCEPTED)
@@ -276,9 +264,7 @@ class ImageUserViews(MethodView):
     )
     def delete(self, image_id: str):
         """As a user, i can delete my business image"""
-        imageMode: BusinessImageModel = BusinessImageModel.get_model_by_id(
-            model_id=image_id
-        )
+        imageMode: BusinessImageModel = BusinessImageModel.get_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,
@@ -305,9 +291,7 @@ class ImageUserViews(MethodView):
     )
     def put(self, image_id: str):
         """as a user, i can update my business image"""
-        imageMode: BusinessImageModel = BusinessImageModel.get_model_by_id(
-            model_id=image_id
-        )
+        imageMode: BusinessImageModel = BusinessImageModel.get_by_id(model_id=image_id)
         if bool(imageMode) == False:
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,

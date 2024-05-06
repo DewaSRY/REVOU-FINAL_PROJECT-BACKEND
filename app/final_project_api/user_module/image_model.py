@@ -10,7 +10,7 @@ from sqlalchemy import String, ForeignKey, DateTime
 from app.model_base_service import db, ModelBaseService
 
 
-class UserImageModel(UserImageData, ModelBaseService["UserImageModel"], db.Model):
+class UserImageModel(UserImageData, ModelBaseService, db.Model):
     __tablename__ = "user_image"
     id = mapped_column("id", String(36), primary_key=True)
     public_id = mapped_column("public_id", String(36))
@@ -22,14 +22,14 @@ class UserImageModel(UserImageData, ModelBaseService["UserImageModel"], db.Model
 
     @property
     def username(self):
-        userModel: UserModel = UserModel.get_model_by_id(model_id=self.user_id)
+        userModel: UserModel = UserModel.get_by_id(model_id=self.user_id)
         return userModel.username
 
     @classmethod
     def put_as_profile(cls, image_id: str) -> "UserModel":
 
-        imageMode = UserImageModel.get_model_by_id(model_id=image_id)
-        userModel: UserModel = UserModel.get_model_by_id(model_id=imageMode.user_id)
+        imageMode = UserImageModel.get_by_id(model_id=image_id)
+        userModel: UserModel = UserModel.get_by_id(model_id=imageMode.user_id)
         userModel.profile_url = imageMode.secure_url
         cls.session.add(userModel)
         cls.session.commit()
@@ -37,8 +37,8 @@ class UserImageModel(UserImageData, ModelBaseService["UserImageModel"], db.Model
 
     @classmethod
     def delete_model_by_id(cls, model_id: str):
-        imageModel = UserImageModel.get_model_by_id(model_id=model_id)
-        userModel: UserModel = UserModel.get_model_by_id(model_id=imageModel.user_id)
+        imageModel = UserImageModel.get_by_id(model_id=model_id)
+        userModel: UserModel = UserModel.get_by_id(model_id=imageModel.user_id)
         if imageModel.secure_url == userModel.profile_url:
             userModel.profile_url = ""
             cls.session.add(userModel)
@@ -48,7 +48,7 @@ class UserImageModel(UserImageData, ModelBaseService["UserImageModel"], db.Model
         return imageModel
 
     @classmethod
-    def get_model_by_id(cls, model_id: str) -> "UserImageModel":
+    def get_by_id(cls, model_id: str) -> "UserImageModel":
         return (
             cls.session.query(UserImageModel)
             .filter(UserImageModel.id == model_id)
@@ -68,7 +68,7 @@ class UserImageModel(UserImageData, ModelBaseService["UserImageModel"], db.Model
         cls, secure_url: str, public_id: str, user_id: str
     ) -> "UserImageModel":
 
-        userModel: UserModel = UserModel.get_model_by_id(model_id=user_id)
+        userModel: UserModel = UserModel.get_by_id(model_id=user_id)
         if bool(userModel.profile_url) != True:
             userModel.profile_url = secure_url
 
@@ -80,5 +80,5 @@ class UserImageModel(UserImageData, ModelBaseService["UserImageModel"], db.Model
         cls.session.commit()
         return model
 
-    def _get_all_model(self):
+    def _get_all(self):
         return self.session.query(UserImageModel).all()

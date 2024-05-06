@@ -2,8 +2,9 @@
 """
 
 from marshmallow import Schema, fields, post_load
-from app.final_project_api.views.product.product_schemas import ProductSchema
-from app.final_project_api.model.business import BusinessCreateData
+from app.final_project_api.product_module.schema import ProductSchema
+from .data import BusinessCreateData
+
 from app.image_upload_service import ImageModelSchema
 
 

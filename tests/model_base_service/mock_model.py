@@ -14,10 +14,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import mapped_column
 from .mock_data import MockData
-from typing import Union
+from typing import Union, Self
 
 
-class MockModelBase(MockData, ModelBaseService["MockModelBase"], db.Model):
+class MockModelBase(MockData, ModelBaseService, db.Model):
     id = mapped_column("data_id", Integer, primary_key=True)
     name = mapped_column("name", String(50))
     username = ""
@@ -29,7 +29,7 @@ class MockModelBase(MockData, ModelBaseService["MockModelBase"], db.Model):
         "use as mark to receive model base service update"
         self.name = name
 
-    def _get_model_by_id(self, model_id: int) -> Union[None, "MockModelBase"]:
+    def _get_by_id(self, model_id: int) -> Union[None, Self]:
         return (
             self.session.query(MockModelBase)
             .filter(MockModelBase.id == model_id)
@@ -39,5 +39,5 @@ class MockModelBase(MockData, ModelBaseService["MockModelBase"], db.Model):
     def _delete(self):
         self.session.delete(self)
 
-    def _get_all_model(self) -> list["MockModelBase"]:
+    def _get_all(self) -> list[Self]:
         return self.session.query(MockModelBase).all()

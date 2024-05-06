@@ -4,18 +4,20 @@ Returns:
     _type_: _description_
 """
 
+from datetime import datetime
 from dataclasses import dataclass, field
+from passlib.hash import pbkdf2_sha256
+
 from app.model_base_service import DataBaseDefault
 from app.image_upload_service import ImageData
 
-from app.final_project_api.model.business import BusinessDate
-from app.final_project_api.model.product import ProductData
-from passlib.hash import pbkdf2_sha256
-from datetime import datetime
+from app.final_project_api.business_module.data import BusinessDate
+from app.final_project_api.product_module.data import ProductData
 
 
 @dataclass
 class UserImageData(ImageData):
+
     user_id: str = field(default_factory=str)
     username: str = field(default_factory=str)
 
@@ -32,10 +34,7 @@ class UserTypeData:
 
 @dataclass
 class UserData(DataBaseDefault):
-    password: str
 
-    username: str
-    email: str
     phone_number: str = field(init=False, default_factory=str)
     address: str = field(init=False, default_factory=str)
     occupation: str = field(init=False, default_factory=str)
@@ -49,8 +48,11 @@ class UserData(DataBaseDefault):
     user_type: str = field(init=False)
     business: list[BusinessDate] = field(init=False, default_factory=list, repr=False)
     product: list[ProductData] = field(init=False, default_factory=list, repr=False)
-    product_amount: int = field(init=False)
     business_amount: int = field(init=False)
+    product_amount: int = field(init=False)
+    username: str = field(default="")
+    password: str = field(default="")
+    email: str = field(default="")
 
     def __init__(self, username: str, email: str, password: str):
         super().__init__()
@@ -69,16 +71,21 @@ class UserData(DataBaseDefault):
         self.password = pbkdf2_sha256.hash(password)
 
     def match_password(self, receive_password: str) -> bool:
+        """match_password"""
         return pbkdf2_sha256.verify(secret=receive_password, hash=self.password)
 
 
 @dataclass
 class AuthData:
-    password: str
+    """AuthData"""
+
     username: str = field(default_factory=str)
     email: str = field(default_factory=str)
+    password: str = field(default_factory=str)
 
-    def getCredential(self):
+    def getCredential(self) -> str:
+        """getCredential"""
+
         if len(self.email) == 0:
             return f"username: '{self.username}'"
         elif len(self.username) == 0:
@@ -87,6 +94,8 @@ class AuthData:
             return f"username : '{self.username}',email: '{self.email}'  "
 
     def passwordNotMatchMessage(self):
+        """passwordNotMatchMessage"""
+
         return (
             f"password:'{self.password}' not match with account {self.getCredential()}"
         )
@@ -94,6 +103,8 @@ class AuthData:
 
 @dataclass
 class UserUpdateData:
+    """UserUpdateData"""
+
     username: str = field(default_factory=str)
     email: str = field(default_factory=str)
     phone_number: str = field(default_factory=str)
@@ -104,6 +115,8 @@ class UserUpdateData:
 
 @dataclass
 class AuthResponseData(UserUpdateData):
+    """AuthResponseData"""
+
     access_token: str = field(default_factory=str)
 
     user_id: str = field(default_factory=str)

@@ -10,8 +10,8 @@ class ModelBase:
     def _delete(self):
         raise Exception()
 
-    def _getAll(self) -> list[Self]:
-        raise Exception(f"{self.__class__} not implement __get_all_model")
+    def _get_all(self) -> list[Self]:
+        raise Exception(f"{self.__class__} not implement __get_all")
 
-    def _getById(self, model_id: Union[str, int]) -> Union[Self, None]:
-        raise Exception(f"{self.__class__} not implement _get_model_by_id")
+    def _get_by_id(self, model_id: Union[str, int]) -> Union[Self, None]:
+        raise Exception(f"{self.__class__} not implement _get_by_id")

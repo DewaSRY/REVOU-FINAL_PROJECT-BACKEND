@@ -38,25 +38,25 @@ class UserModel(UserData, ModelBaseService, db.Model):
 
     @property
     def business_amount(self):
-        from app.final_project_api.model.business import BusinessModel as BM
+        from app.final_project_api.business_module.model import BusinessModel as BM
 
         return len(BM.get_by_user_id(self.id))
 
     @property
     def product_amount(self):
-        from app.final_project_api.model.product import ProductModel as PM
+        from app.final_project_api.product_module.model import ProductModel as PM
 
         return len(PM.get_by_user_id(self.id))
 
     @property
     def business(self):
-        from app.final_project_api.model.business import BusinessModel
+        from app.final_project_api.business_module.model import BusinessModel
 
         return BusinessModel.get_by_user_id(self.id)
 
     @property
     def product(self):
-        from app.final_project_api.model.product import ProductModel
+        from app.final_project_api.product_module.model import ProductModel
 
         return ProductModel.get_by_user_id(self.id)
 
@@ -64,7 +64,7 @@ class UserModel(UserData, ModelBaseService, db.Model):
     def user_type(self):
         from .type_model import UserTypeModel
 
-        type = UserTypeModel.get_model_by_id(self.user_type_id)
+        type = UserTypeModel.get_by_id(self.user_type_id)
         if type == None:
             raise Exception(f"user type with id {self.user_type_id }  not found")
         return type.name
@@ -81,7 +81,7 @@ class UserModel(UserData, ModelBaseService, db.Model):
 
     @classmethod
     def update_with_update_data(cls, user_id: str, update_data: UserUpdateData):
-        userModel: UserModel = UserModel.get_model_by_id(model_id=user_id)
+        userModel: UserModel = UserModel.get_by_id(model_id=user_id)
         userModel._update(
             username=update_data.username,
             email=update_data.email,
@@ -125,10 +125,10 @@ class UserModel(UserData, ModelBaseService, db.Model):
         cls.session.commit()
         return model
 
-    def _get_model_by_id(self, model_id: str) -> Union["UserModel", None]:
+    def _get_by_id(self, model_id: str) -> Union["UserModel", None]:
         return self.session.query(UserModel).filter(UserModel.id == model_id).first()
 
-    def _get_all_model(self) -> list[ModelBase]:
+    def _get_all(self) -> list[ModelBase]:
         return self.session.query(UserModel).all()
 
     def _update(

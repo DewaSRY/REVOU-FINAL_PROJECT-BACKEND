@@ -11,9 +11,7 @@ from .data import BusinessImageData
 from .model import BusinessModel
 
 
-class BusinessImageModel(
-    BusinessImageData, ModelBaseService["BusinessImageModel"], db.Model
-):
+class BusinessImageModel(BusinessImageData, ModelBaseService, db.Model):
     __tablename__ = "business_images"
     id = mapped_column("id", String(36), primary_key=True)
     public_id = mapped_column("public_id", String(36))
@@ -27,13 +25,13 @@ class BusinessImageModel(
 
     @property
     def business_name(self):
-        bModel: BusinessModel = BusinessModel.get_model_by_id(model_id=self.business_id)
+        bModel: BusinessModel = BusinessModel.get_by_id(model_id=self.business_id)
         return bModel.business_name
 
-    def _get_all_model(self):
+    def _get_all(self):
         return self.session.query(BusinessImageModel).all()
 
-    def _get_model_by_id(self, model_id: str) -> "BusinessImageModel":
+    def _get_by_id(self, model_id: str) -> "BusinessImageModel":
         return (
             self.session.query(BusinessImageModel)
             .filter(BusinessImageModel.id == model_id)
@@ -41,7 +39,7 @@ class BusinessImageModel(
         )
 
     @classmethod
-    def get_image_by_business_id(cls, business_id: str) -> list["BusinessImageModel"]:
+    def get_by_business_id(cls, business_id: str) -> list["BusinessImageModel"]:
         return (
             cls.session.query(BusinessImageModel)
             .filter(BusinessImageModel.business_id == business_id)
@@ -51,10 +49,8 @@ class BusinessImageModel(
     @classmethod
     def put_as_profile(cls, image_id: str) -> BusinessModel:
 
-        imageMode: BusinessImageModel = BusinessImageModel.get_model_by_id(
-            model_id=image_id
-        )
-        businessModel: BusinessModel = BusinessModel.get_model_by_id(
+        imageMode: BusinessImageModel = BusinessImageModel.get_by_id(model_id=image_id)
+        businessModel: BusinessModel = BusinessModel.get_by_id(
             model_id=imageMode.business_id
         )
         businessModel.profile_url = imageMode.secure_url
@@ -67,9 +63,7 @@ class BusinessImageModel(
         cls, secure_url: str, public_id: str, business_id: str
     ) -> "BusinessImageModel":
 
-        businessModel: BusinessModel = BusinessModel.get_model_by_id(
-            model_id=business_id
-        )
+        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
         if bool(businessModel.profile_url) != True:
             businessModel.profile_url = secure_url
 

@@ -3,9 +3,11 @@
 
 from tests.mock_database_connection import MockDatabaseConnection
 
-from app.final_project_api.model.user import UserModel
-from app.final_project_api.model.business import BusinessModel, BusinessTypeModel
-from app.final_project_api.model.product import ProductModel, ProductImageModel
+from app.final_project_api.user_module.model import UserModel
+from app.final_project_api.business_module.model import BusinessModel
+from app.final_project_api.business_module.type_model import BusinessTypeModel
+from app.final_project_api.product_module.model import ProductModel
+from app.final_project_api.product_module.image_model import ProductImageModel
 from pprint import pprint
 from unittest import skip
 from uuid import uuid4
@@ -34,11 +36,11 @@ class TestCreateProduct(MockDatabaseConnection):
         )
 
     def tearDown(self) -> None:
-        UserModel.clean_all_model()
-        BusinessTypeModel.clean_all_model()
-        BusinessModel.clean_all_model()
-        ProductImageModel.clean_all_model()
-        ProductModel.clean_all_model()
+        UserModel.clean_all()
+        BusinessTypeModel.clean_all()
+        BusinessModel.clean_all()
+        ProductImageModel.clean_all()
+        ProductModel.clean_all()
 
     def test_create_product_image(self):
         first_url = "first ulr"
@@ -93,5 +95,5 @@ class TestCreateProduct(MockDatabaseConnection):
                 product_price=self.product_price,
                 description=self.product_description,
             )
-        modelList = ProductModel.get_all_public_model()
+        modelList = ProductModel.get_all_public()
         assert len(modelList) == 10

@@ -2,7 +2,7 @@
 """
 
 from marshmallow import Schema, fields, post_load
-from app.final_project_api.model.product import ProductCreateData, ProductUpdateData
+from .data import ProductCreateData, ProductUpdateData
 from app.image_upload_service import ImageModelSchema
 
 
@@ -11,7 +11,6 @@ class ProductImageModelSchema(ImageModelSchema):
 
 
 class ProductSchema(Schema):
-    # TODO: delete this and change what inside user schema
     product_name = fields.Str()
     product_price = fields.Float()
     product_images = fields.List(fields.Nested(ImageModelSchema))

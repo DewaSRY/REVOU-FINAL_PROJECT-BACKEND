@@ -28,19 +28,14 @@ class ProductImageModel(ProductImageData, ModelBaseService, db.Model):
     @property
     def product_name(self):
 
-        productModel: ProductModel = ProductModel.get_model_by_id(
-            model_id=self.product_id
-        )
+        productModel: ProductModel = ProductModel.get_by_id(model_id=self.product_id)
         return productModel.product_name
-
-    def _get_all_model(self):
-        return self.session.query(ProductImageModel).all()
 
     @classmethod
     def put_as_profile(cls, image_id: str) -> "ProductModel":
 
-        imageMode: Self = ProductImageModel.get_model_by_id(model_id=image_id)
-        productModel: ProductModel = ProductModel.get_model_by_id(
+        imageMode: Self = ProductImageModel.get_by_id(model_id=image_id)
+        productModel: ProductModel = ProductModel.get_by_id(
             model_id=imageMode.product_id
         )
         productModel.profile_url = imageMode.secure_url
@@ -51,10 +46,8 @@ class ProductImageModel(ProductImageData, ModelBaseService, db.Model):
     @classmethod
     def delete_model_by_id(cls, model_id: str):
 
-        imageModel = ProductImageModel.get_model_by_id(model_id=model_id)
-        productModel: ProductModel = ProductModel.get_model_by_id(
-            model_id=imageModel.user_id
-        )
+        imageModel = ProductImageModel.get_by_id(model_id=model_id)
+        productModel: ProductModel = ProductModel.get_by_id(model_id=imageModel.user_id)
         if imageModel.secure_url == productModel.profile_url:
             productModel.profile_url = ""
             cls.session.add(productModel)
@@ -64,7 +57,7 @@ class ProductImageModel(ProductImageData, ModelBaseService, db.Model):
         return imageModel
 
     @classmethod
-    def get_model_by_id(cls, model_id: str):
+    def get_by_id(cls, model_id: str):
         return (
             cls.session.query(ProductImageModel)
             .filter(ProductImageModel.id == model_id)
@@ -80,9 +73,11 @@ class ProductImageModel(ProductImageData, ModelBaseService, db.Model):
         )
 
     @classmethod
-    def add_model(cls, secure_url: str, public_id: str, product_id: str) -> Self:
+    def add_model(
+        cls, secure_url: str, public_id: str, product_id: str
+    ) -> "ProductImageModel":
 
-        productModel: ProductModel = ProductModel.get_model_by_id(model_id=product_id)
+        productModel: ProductModel = ProductModel.get_by_id(model_id=product_id)
         if bool(productModel) == False:
             message = MessageService.get_message("product_not_found").format(product_id)
             raise Exception(message)
@@ -97,3 +92,6 @@ class ProductImageModel(ProductImageData, ModelBaseService, db.Model):
         cls.session.add(model)
         cls.session.commit()
         return model
+
+    def _get_all(self):
+        return self.session.query(ProductImageModel).all()

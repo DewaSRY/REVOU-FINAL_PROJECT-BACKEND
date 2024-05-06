@@ -18,7 +18,7 @@ class ModelBaseService(ModelBase):
         self.session.delete(self)
 
     @classmethod
-    def setSession(cls, session: Session) -> None:
+    def set_session(cls, session: Session) -> None:
         cls.session = session
 
     @classmethod
@@ -31,8 +31,8 @@ class ModelBaseService(ModelBase):
             raise Exception(f"{cls.__call__} failed to add model")
 
     @classmethod
-    def getById(cls, model_id: Union[str, int]):
-        return cls._getById(cls, model_id=model_id)
+    def get_by_id(cls, model_id: Union[str, int]):
+        return cls._get_by_id(cls, model_id=model_id)
 
     @classmethod
     def update(cls, model: Self, **args) -> Self:
@@ -54,23 +54,23 @@ class ModelBaseService(ModelBase):
             raise e
 
     @classmethod
-    def updateWithId(cls, model_id: Union[str, int], **args):
-        model: Self = cls._getById(cls, model_id=model_id)
+    def update_with_id(cls, model_id: Union[str, int], **args):
+        model: Self = cls._get_by_id(cls, model_id=model_id)
         cls.update(model=model, **args)
         return model
 
     @classmethod
-    def deleteModelWithId(cls, model_id: Union[str, int]):
-        model: Self = cls._getById(cls, model_id=model_id)
+    def delete_model_withId(cls, model_id: Union[str, int]):
+        model: Self = cls._get_by_id(cls, model_id=model_id)
         cls.delete(model=model)
 
     @classmethod
     def get_all_model(cls: Self) -> list[Self]:
-        return cls._getAll(cls)
+        return cls._get_all(cls)
 
     @classmethod
-    def cleanAll(cls):
-        all_model_to_clean: list[Self] = cls._getAll(cls)
+    def clean_all(cls):
+        all_model_to_clean: list[Self] = cls._get_all(cls)
         for model in all_model_to_clean:
             model._delete()
             cls.session.commit()

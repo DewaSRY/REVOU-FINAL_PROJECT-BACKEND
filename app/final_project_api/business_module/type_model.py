@@ -5,37 +5,26 @@ from .data import BusinessTypeData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import String, Integer
 from app.model_base_service import ModelBaseService, db
-from typing import Union
+from typing import Union, Self
 
 
-class BusinessTypeModel(
-    BusinessTypeData, ModelBaseService["BusinessTypeModel"], db.Model
-):
+class BusinessTypeModel(BusinessTypeData, ModelBaseService, db.Model):
     __tablename__ = "business_type"
     id = mapped_column("id", Integer, primary_key=True)
     name = mapped_column("name", String(50), unique=True)
 
-    def _get_all_model(self):
+    def _get_all(self) -> list[Self]:
         return self.session.query(BusinessTypeModel).all()
 
-    def _get_model_by_id(self, model_id: int) -> "BusinessTypeModel":
+    def _get_by_id(self, model_id: int) -> Self:
         return (
             self.session.query(BusinessTypeModel)
             .filter(BusinessTypeModel.id == model_id)
             .first()
         )
 
-    def getStore(self):
-        return self.name
-
     @classmethod
-    def get_match_model_by_name(
-        cls, model_name: str
-    ) -> Union["BusinessTypeModel", None]:
-        """_summary_
-        Returns:
-            Union["BusinessTypeModel", None]: _description_
-        """
+    def get_match_model_by_name(cls, model_name: str) -> Union[Self, None]:
         return (
             cls.session.query(BusinessTypeModel)
             .filter(BusinessTypeModel.name.like(model_name))
@@ -48,15 +37,7 @@ class BusinessTypeModel(
         return [model.name for model in typList]
 
     @classmethod
-    def add_model(cls, name: str) -> "BusinessTypeModel":
-        """add_model
-        Args:
-            name (str): put the business name
-        Raises:
-            Exception: _description_
-        Returns:
-            BusinessTypeModel: BusinessTypeModel
-        """
+    def add_model(cls, name: str) -> Self:
         try:
             model = BusinessTypeModel(name=name)
             cls.session.add(model)

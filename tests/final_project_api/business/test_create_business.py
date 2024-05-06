@@ -3,32 +3,32 @@
 
 from tests.mock_database_connection import MockDatabaseConnection
 
-from app.final_project_api.model.user import UserModel
-from app.final_project_api.model.business import (
-    BusinessTypeModel,
-    BusinessModel,
-    BusinessImageModel,
-)
+from app.final_project_api.user_module.model import UserModel
+from app.final_project_api.business_module.model import BusinessModel
+from app.final_project_api.business_module.image_model import BusinessImageModel
+from app.final_project_api.business_module.type_model import BusinessTypeModel
+
+
 from pprint import pprint
 from unittest import skip
 from uuid import uuid4
 
 
-class TestCreateBusinessImage(MockDatabaseConnection):
+class TestCreateBusiness(MockDatabaseConnection):
 
     def setup_class(self):
         super().setup_class(self)
-        UserModel.clean_all_model()
-        BusinessTypeModel.clean_all_model()
-        BusinessModel.clean_all_model()
+        UserModel.clean_all()
+        BusinessTypeModel.clean_all()
+        BusinessModel.clean_all()
         self.business_name = "some name test"
         self.business_description = "some description "
 
     def tearDown(self) -> None:
-        UserModel.clean_all_model()
-        BusinessTypeModel.clean_all_model()
-        BusinessModel.clean_all_model()
-        BusinessImageModel.clean_all_model()
+        UserModel.clean_all()
+        BusinessTypeModel.clean_all()
+        BusinessModel.clean_all()
+        BusinessImageModel.clean_all()
 
     def setUp(self) -> None:
         super().setUp()

@@ -7,7 +7,7 @@ from sqlalchemy import Integer, String
 from app.model_base_service import db, ModelBaseService
 
 
-class UserTypeModel(UserTypeData, ModelBaseService["UserTypeModel"], db.Model):
+class UserTypeModel(UserTypeData, ModelBaseService, db.Model):
     __tablename__ = "user_type"
     id = mapped_column("id", Integer, primary_key=True)
     name = mapped_column("name", String(20), unique=True)
@@ -15,7 +15,7 @@ class UserTypeModel(UserTypeData, ModelBaseService["UserTypeModel"], db.Model):
     def _delete(self):
         self.session.delete(self)
 
-    def _get_model_by_id(self, model_id: int) -> "UserTypeModel":
+    def _get_by_id(self, model_id: int) -> "UserTypeModel":
         model = (
             self.session.query(UserTypeModel)
             .filter(UserTypeModel.id == model_id)
@@ -23,7 +23,7 @@ class UserTypeModel(UserTypeData, ModelBaseService["UserTypeModel"], db.Model):
         )
         return model
 
-    def _get_all_model(self) -> list["UserTypeModel"]:
+    def _get_all(self) -> list["UserTypeModel"]:
         return self.session.query(UserTypeModel).all()
 
     @classmethod
