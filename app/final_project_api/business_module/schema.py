@@ -3,9 +3,10 @@
 
 from marshmallow import Schema, fields, post_load
 from app.final_project_api.product_module.schema import ProductSchema
-from .data import BusinessCreateData
 
 from app.image_upload_service import ImageModelSchema
+from app.util.query_data import QuerySchema
+from .data import BusinessCreateData
 
 
 class BusinessImageModelSchema(ImageModelSchema):
@@ -61,3 +62,9 @@ class BusinessWithImageModel(Schema):
     update_at = fields.DateTime()
     profile_url = fields.Str()
     business_images = fields.List(fields.Nested(ImageModelSchema))
+
+
+class BusinessPublicListSchema(QuerySchema):
+    data = fields.List(fields.Nested(BusinessPublicSchema))
+    total_page = fields.Integer()
+    total_data = fields.Integer()

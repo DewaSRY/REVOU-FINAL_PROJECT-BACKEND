@@ -28,7 +28,9 @@ from .schema import (
     BusinessWithImageModel,
     BusinessImageModelSchema,
     BusinessPublicSchema,
+    BusinessPublicListSchema,
 )
+from .data import PublicBusiness
 
 from app.util import QueryData, QuerySchema
 from pprint import pprint
@@ -44,10 +46,13 @@ blp = Blueprint(
 @blp.route("")
 class BusinessViews(MethodView):
     @blp.arguments(schema=QuerySchema, location="query")
-    @blp.response(schema=BusinessPublicSchema(many=True), status_code=HTTPStatus.OK)
+    @blp.response(schema=BusinessPublicListSchema, status_code=HTTPStatus.OK)
     def get(self, query_data: QueryData):
         """As a user, i can get all business public data without auth"""
-        return BusinessModel.get_all_public(query_data=query_data)
+        return PublicBusiness(
+            queryData=query_data,
+            businessList=BusinessModel.get_all_public(query_data=query_data),
+        )
 
     @jwt_required()
     @blp.arguments(schema=BusinessCreateSchema)

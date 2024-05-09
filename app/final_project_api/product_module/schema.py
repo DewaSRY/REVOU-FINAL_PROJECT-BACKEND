@@ -4,6 +4,7 @@
 from marshmallow import Schema, fields, post_load
 from .data import ProductCreateData, ProductUpdateData
 from app.image_upload_service import ImageModelSchema
+from app.util.query_data import QuerySchema
 
 
 class ProductImageModelSchema(ImageModelSchema):
@@ -71,3 +72,9 @@ class ProductWithImageModel(Schema):
     update_at = fields.DateTime()
     profile_url = fields.Str()
     product_images = fields.List(fields.Nested(ImageModelSchema))
+
+
+class ProductPublicListSchema(QuerySchema):
+    data = fields.List(fields.Nested(ProductPublicSchemas))
+    total_page = fields.Integer()
+    total_data = fields.Integer()

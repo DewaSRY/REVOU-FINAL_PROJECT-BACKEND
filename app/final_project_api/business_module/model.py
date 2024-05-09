@@ -1,7 +1,7 @@
 """_summary_
 """
 
-from .data import BusinessDate, BusinessCreateData
+from .data import BusinessData, BusinessCreateData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey, String, Boolean, DateTime, desc
@@ -11,7 +11,7 @@ from app.util import QueryData, QuerySchema
 from datetime import datetime
 
 
-class BusinessModel(BusinessDate, ModelBaseService, db.Model):
+class BusinessModel(BusinessData, ModelBaseService, db.Model):
     __tablename__ = "business"
     id = mapped_column("business_id", String(36), primary_key=True)
     user_id = mapped_column("user_id", String(36), ForeignKey("user.user_id"))
@@ -69,41 +69,9 @@ class BusinessModel(BusinessDate, ModelBaseService, db.Model):
 
         return UserModel.get_by_id(model_id=self.user_id).email
 
-    def _update(
-        self,
-        business_name: str = "",
-        business_type_name: str = "",
-        description: str = "",
-    ) -> None:
-        if len(business_name) != 0:
-            self.business_name = business_name
-        if len(business_type_name) != 0:
-            self.business_type_name = business_type_name
-        if len(description) != 0:
-            self.description = description
-
-    def _set_match_business_type(self, business_type_name: str):
-        from .type_model import BusinessTypeModel
-
-        businessType: BusinessTypeModel = BusinessTypeModel.get_match_model_by_name(
-            model_name=business_type_name
-        )
-        if businessType == None:
-            message = MessageService.get_message("business_typ_not_found").format(
-                f"{business_type_name} not in available list:   "
-            )
-            raise Exception(message)
-        self.business_type_id = businessType.id
-
-    def _get_all(self):
-        return self.session.query(BusinessModel).all()
-
-    def _get_by_id(self, model_id: str) -> "BusinessModel":
-        return (
-            self.session.query(BusinessModel)
-            .filter(BusinessModel.id == model_id)
-            .first()
-        )
+    @classmethod
+    def total_row(cls):
+        return cls.session.query(BusinessModel).count()
 
     @classmethod
     def delete_by_id(cls, model_id: str):
@@ -180,3 +148,39 @@ class BusinessModel(BusinessDate, ModelBaseService, db.Model):
         cls.session.add(model)
         cls.session.commit()
         return model
+
+    def _update(
+        self,
+        business_name: str = "",
+        business_type_name: str = "",
+        description: str = "",
+    ) -> None:
+        if len(business_name) != 0:
+            self.business_name = business_name
+        if len(business_type_name) != 0:
+            self.business_type_name = business_type_name
+        if len(description) != 0:
+            self.description = description
+
+    def _set_match_business_type(self, business_type_name: str):
+        from .type_model import BusinessTypeModel
+
+        businessType: BusinessTypeModel = BusinessTypeModel.get_match_model_by_name(
+            model_name=business_type_name
+        )
+        if businessType == None:
+            message = MessageService.get_message("business_typ_not_found").format(
+                f"{business_type_name} not in available list:   "
+            )
+            raise Exception(message)
+        self.business_type_id = businessType.id
+
+    def _get_all(self):
+        return self.session.query(BusinessModel).all()
+
+    def _get_by_id(self, model_id: str) -> "BusinessModel":
+        return (
+            self.session.query(BusinessModel)
+            .filter(BusinessModel.id == model_id)
+            .first()
+        )

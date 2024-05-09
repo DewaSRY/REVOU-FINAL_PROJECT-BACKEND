@@ -57,6 +57,10 @@ class ProductModel(ProductData, ModelBaseService, db.Model):
         return imageList
 
     @classmethod
+    def total_row(cls):
+        return cls.session.query(ProductModel).count()
+
+    @classmethod
     def delete_model_by_id(cls, model_id: str):
         productModel: ProductModel = ProductModel.get_by_id(model_id=model_id)
         productModel.is_delete = True

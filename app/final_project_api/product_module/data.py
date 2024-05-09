@@ -1,10 +1,12 @@
 """_summary_
 """
 
+from math import ceil
 from dataclasses import dataclass, field
 
 from app.model_base_service import DataBaseDefault
 from app.image_upload_service import ImageData
+from app.util.query_data import QueryData
 
 
 @dataclass
@@ -58,3 +60,28 @@ class ProductUpdateData:
 @dataclass
 class ProductCreateData(ProductUpdateData):
     business_id: str
+
+
+@dataclass
+class PublicProduct(QueryData):
+    data: list[ProductData] = field(default_factory=list)
+
+    @property
+    def total_data(cls):
+        from .model import ProductModel
+
+        modelAmount = ProductModel.total_row()
+        return modelAmount
+
+    @property
+    def total_page(self):
+        from .model import ProductModel
+
+        modelAmount = ProductModel.total_row()
+        return ceil(modelAmount / self.limit)
+
+    def __init__(self, queryData: QueryData, productList: list[ProductData]):
+        super().__init__(
+            page=queryData.page, limit=queryData.limit, search=queryData.search
+        )
+        self.data = productList

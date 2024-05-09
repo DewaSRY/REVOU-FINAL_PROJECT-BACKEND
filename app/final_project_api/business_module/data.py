@@ -1,10 +1,12 @@
 """_summary_
 """
 
+from math import ceil
 from dataclasses import dataclass, field
 from app.model_base_service import DataBaseDefault
 from app.final_project_api.product_module.data import ProductData
 from app.image_upload_service import ImageData
+from app.util.query_data import QueryData
 
 
 @dataclass
@@ -26,7 +28,7 @@ class BusinessTypeData:
 
 
 @dataclass(kw_only=True)
-class BusinessDate(DataBaseDefault):
+class BusinessData(DataBaseDefault):
     user_id: str
     business_name: str
     business_types: str = field(init=False, compare=False)
@@ -66,3 +68,28 @@ class BusinessCreateData:
     business_name: str = field(default_factory=str)
     business_types: str = field(default_factory=str)
     description: str = field(default_factory=str)
+
+
+@dataclass
+class PublicBusiness(QueryData):
+    data: list[BusinessData] = field(default_factory=list)
+
+    @property
+    def total_data(cls):
+        from .model import BusinessModel
+
+        modelAmount = BusinessModel.total_row()
+        return modelAmount
+
+    @property
+    def total_page(self):
+        from .model import BusinessModel
+
+        modelAmount = BusinessModel.total_row()
+        return ceil(modelAmount / self.limit)
+
+    def __init__(self, queryData: QueryData, businessList: list[BusinessData]):
+        super().__init__(
+            page=queryData.page, limit=queryData.limit, search=queryData.search
+        )
+        self.data = businessList

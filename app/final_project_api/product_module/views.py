@@ -31,8 +31,9 @@ from .schema import (
     ProductImageModelSchema,
     ProductWithImageModel,
     ProductUpdateSchema,
+    ProductPublicListSchema,
 )
-
+from .data import PublicProduct
 
 blp = Blueprint(
     "product",
@@ -46,10 +47,13 @@ blp = Blueprint(
 class ProductViews(MethodView):
 
     @blp.arguments(schema=QuerySchema, location="query")
-    @blp.response(schema=ProductPublicSchemas(many=True), status_code=HTTPStatus.OK)
+    @blp.response(schema=ProductPublicListSchema, status_code=HTTPStatus.OK)
     def get(self, query_data: QueryData):
         """As a user, i can get all product event without access token"""
-        return ProductModel.get_all_public(query_data=query_data)
+        return PublicProduct(
+            queryData=query_data,
+            productList=ProductModel.get_all_public(query_data=query_data),
+        )
 
     @jwt_required()
     @blp.arguments(schema=ProductCreateSchema)

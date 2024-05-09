@@ -11,7 +11,7 @@ from passlib.hash import pbkdf2_sha256
 from app.model_base_service import DataBaseDefault
 from app.image_upload_service import ImageData
 
-from app.final_project_api.business_module.data import BusinessDate
+from app.final_project_api.business_module.data import BusinessData
 from app.final_project_api.product_module.data import ProductData
 
 
@@ -46,7 +46,7 @@ class UserData(DataBaseDefault):
 
     user_type_id: int = field(init=False)
     user_type: str = field(init=False)
-    business: list[BusinessDate] = field(init=False, default_factory=list, repr=False)
+    business: list[BusinessData] = field(init=False, default_factory=list, repr=False)
     product: list[ProductData] = field(init=False, default_factory=list, repr=False)
     business_amount: int = field(init=False)
     product_amount: int = field(init=False)
@@ -127,7 +127,7 @@ class AuthResponseData(UserUpdateData):
     profile_url: str = field(default_factory=str)
     images: list[str] = field(default_factory=list)
 
-    business: list["BusinessDate"] = field(default_factory=list, repr=False)
+    business: list["BusinessData"] = field(default_factory=list, repr=False)
     product: list["ProductData"] = field(default_factory=list, repr=False)
     business_amount: int = field(default_factory=str)
     product_amount: int = field(default_factory=str)
