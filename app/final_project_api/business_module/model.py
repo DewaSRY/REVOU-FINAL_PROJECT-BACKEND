@@ -4,7 +4,7 @@
 from .data import BusinessDate, BusinessCreateData
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.sql import func
-from sqlalchemy import ForeignKey, String, Boolean, DateTime
+from sqlalchemy import ForeignKey, String, Boolean, DateTime, desc
 from app.model_base_service import db, ModelBaseService
 from app.message_service import MessageService
 from app.util import QueryData, QuerySchema
@@ -138,11 +138,13 @@ class BusinessModel(BusinessDate, ModelBaseService, db.Model):
             return (
                 queryPointer.filter(BusinessModel.is_delete == False)
                 .filter(BusinessModel.business_name.like(query_data.search))
+                .order_by(desc(BusinessModel.create_at))
                 .all()
             )
         offset = (query_data.page - 1) * query_data.limit
         return (
             queryPointer.filter(BusinessModel.is_delete == False)
+            .order_by(desc(BusinessModel.create_at))
             .limit(query_data.limit)
             .offset(offset)
             .all()

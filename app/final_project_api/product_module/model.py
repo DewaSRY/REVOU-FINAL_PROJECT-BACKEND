@@ -6,7 +6,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.sql import func
-from sqlalchemy import String, DateTime, Integer, ForeignKey, Float, Boolean
+from sqlalchemy import String, DateTime, Integer, ForeignKey, Float, Boolean, desc
 
 from .data import ProductData, ProductUpdateData
 from app.util import QueryData
@@ -89,11 +89,13 @@ class ProductModel(ProductData, ModelBaseService, db.Model):
             return (
                 queryPointer.filter(ProductModel.is_delete == False)
                 .filter(ProductModel.product_name.like(query_data.search))
+                .order_by(desc(ProductModel.create_at))
                 .all()
             )
         offset = (query_data.page - 1) * query_data.limit
         return (
             queryPointer.filter(ProductModel.is_delete == False)
+            .order_by(desc(ProductModel.create_at))
             .limit(query_data.limit)
             .offset(offset)
             .all()

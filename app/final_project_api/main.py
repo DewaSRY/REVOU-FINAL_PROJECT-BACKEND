@@ -68,8 +68,16 @@ def create_app():
             UserTypeModel.add_model(name="user")
             UserTypeModel.add_model(name="admin")
         if len(BusinessTypeModel.get_all_model()) == 0:
-            BusinessTypeModel.add_model(name="food")
-            BusinessTypeModel.add_model(name="book")
+            BusinessTypeModel.add_model(name="food_and_beverage")
+            BusinessTypeModel.add_model(name="fashion")
+            BusinessTypeModel.add_model(name="education")
+            BusinessTypeModel.add_model(name="health_care")
+            BusinessTypeModel.add_model(name="finance")
+            BusinessTypeModel.add_model(name="entertainment")
+            BusinessTypeModel.add_model(name="advertising_and_media")
+            BusinessTypeModel.add_model(name="construction")
+            BusinessTypeModel.add_model(name="manufacturing")
+            BusinessTypeModel.add_model(name="hospitality_and_tourism")
 
     # api.register_blueprint(mainApp)
     api.register_blueprint(UserBluePrint)

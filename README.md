@@ -45,17 +45,11 @@ app
    |-- database_connector
    |-- datetime_service
    |-- final_project_api        # the app logic get mapped
+   |   |-- business_module
+   |   |-- product_module
+   |   |-- user_module
+   |   |-- conftest.py
    |   |-- main.py
-   |   |-- model
-   |   |   |-- business
-   |   |   |-- product
-   |   |   |-- user
-   |   |-- util
-   |   |   |-- query_data.py
-   |   |-- views                # every views have they own schema and views
-   |   |   |-- business
-   |   |   |-- product
-   |   |   |-- user
    |-- image_upload_service
    |-- jwt_service
    |-- message_service
