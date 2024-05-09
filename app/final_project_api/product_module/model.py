@@ -88,7 +88,7 @@ class ProductModel(ProductData, ModelBaseService, db.Model):
         if len(query_data.search) != 0:
             return (
                 queryPointer.filter(ProductModel.is_delete == False)
-                .filter(ProductModel.product_name.like(query_data.search))
+                .filter(ProductModel.product_name.like(query_data.getSearch()))
                 .order_by(desc(ProductModel.create_at))
                 .all()
             )

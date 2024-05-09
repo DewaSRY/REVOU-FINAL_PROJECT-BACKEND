@@ -11,6 +11,9 @@ class QueryData:
     limit: int = field(default_factory=lambda: 10)
     search: str = field(default_factory=str)
 
+    def getSearch(self):
+        return f"%{self.search}%"
+
 
 class QuerySchema(Schema):
     page = fields.Integer()

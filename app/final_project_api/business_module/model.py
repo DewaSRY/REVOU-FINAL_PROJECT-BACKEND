@@ -137,7 +137,7 @@ class BusinessModel(BusinessDate, ModelBaseService, db.Model):
         if len(query_data.search) != 0:
             return (
                 queryPointer.filter(BusinessModel.is_delete == False)
-                .filter(BusinessModel.business_name.like(query_data.search))
+                .filter(BusinessModel.business_name.like(query_data.getSearch()))
                 .order_by(desc(BusinessModel.create_at))
                 .all()
             )
