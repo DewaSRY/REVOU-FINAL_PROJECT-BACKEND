@@ -96,7 +96,6 @@ class BusinessByIdViews(MethodView):
             "pass on url"
         ),
     )
-    @cache.cached(timeout=50)
     def get(self, id: str):
         """As a user i can get business detail by it's id"""
         businessModel: BusinessModel = BusinessModel.get_by_id(model_id=id)
