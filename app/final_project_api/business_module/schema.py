@@ -22,6 +22,7 @@ class BusinessSchemas(Schema):
     create_at = fields.DateTime()
     update_at = fields.DateTime()
     description = fields.Str()
+    is_delete = fields.Bool()
 
 
 class BusinessUpdateSchema(Schema):

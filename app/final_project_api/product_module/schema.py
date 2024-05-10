@@ -17,6 +17,7 @@ class ProductSchema(Schema):
     product_images = fields.List(fields.Nested(ImageModelSchema))
     profile_url = fields.Str()
     id = fields.Str()
+    is_delete = fields.Bool()
     description = fields.Str()
     create_at = fields.DateTime()
     update_at = fields.DateTime()
