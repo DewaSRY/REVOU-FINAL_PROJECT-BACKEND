@@ -5,6 +5,7 @@ from marshmallow import Schema, fields, post_load
 from .data import ProductCreateData, ProductUpdateData
 from app.image_upload_service import ImageModelSchema
 from app.util.query_data import QuerySchema
+from flask_marshmallow.fields import Hyperlinks, URLFor
 
 
 class ProductImageModelSchema(ImageModelSchema):
@@ -15,7 +16,6 @@ class ProductImageModelSchema(ImageModelSchema):
 class ProductSchema(Schema):
     product_name = fields.Str()
     product_price = fields.Float()
-    product_images = fields.List(fields.Nested(ImageModelSchema))
     profile_url = fields.Str()
     id = fields.Str()
     is_delete = fields.Bool()
@@ -53,6 +53,7 @@ class ProductPublicSchemas(Schema):
     update_at = fields.DateTime()
     profile_url = fields.Str()
     business_name = fields.Str(required=True)
+    product_images = fields.List(fields.Nested(ImageModelSchema))
     username = fields.Str(required=True)
     business_id = fields.Str(required=True)
     user_id = fields.Str(required=True)
@@ -65,6 +66,22 @@ class PrivateProductSchema(ProductPublicSchemas):
 
 class ProductModelSchema(ProductPublicSchemas):
     product_images = fields.List(fields.Nested(ImageModelSchema))
+    _links = Hyperlinks(
+        {
+            "self": {
+                "href": URLFor("product.ProductByIdViews", values=dict(id="<id>")),
+                "message": "use for get detail, update or delete ",
+            },
+            "collection": {
+                "href": URLFor("product.ProductViews"),
+                "message": "use for get detail or crete ",
+            },
+            "image": {
+                "href": URLFor("product.ImageProductViews", values=dict(id="<id>")),
+                "message": "use for post image and see detail image ",
+            },
+        }
+    )
 
 
 class ProductWithImageModel(Schema):

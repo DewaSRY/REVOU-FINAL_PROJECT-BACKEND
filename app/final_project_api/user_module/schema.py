@@ -5,6 +5,8 @@ from marshmallow import Schema, fields, post_load
 from app.final_project_api.business_module.schema import BusinessSchemas
 from app.final_project_api.product_module.schema import ProductSchema
 
+from flask_marshmallow.fields import Hyperlinks, URLFor
+
 from .data import AuthData, UserUpdateData
 from app.image_upload_service import ImageModelSchema
 
@@ -75,6 +77,31 @@ class UserModelSchema(UserUpdateSchema):
     business_amount = fields.Integer()
     business = fields.List(fields.Nested(BusinessSchemas), dump_only=True)
     product = fields.List(fields.Nested(ProductSchema), dump_only=True)
+
+    _links = Hyperlinks(
+        {
+            "register": {
+                "href": URLFor("users.UserRegisterView"),
+                "message": "user for register new account",
+            },
+            "login": {
+                "href": URLFor("users.UserLoginViews"),
+                "message": "user for login",
+            },
+            "sign_in": {
+                "href": URLFor("users.UserSignInView"),
+                "message": "use for get detail or crete",
+            },
+            "self": {
+                "href": URLFor("users.UserViews"),
+                "message": "use for update data",
+            },
+            "image": {
+                "href": URLFor("users.ImageUserViews"),
+                "message": "use for post image and see detail image ",
+            },
+        }
+    )
 
 
 class UserAuthSchema(UserModelSchema):

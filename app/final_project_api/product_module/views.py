@@ -100,7 +100,7 @@ class ProductViews(MethodView):
             abort(http_status_code=HTTPStatus.CONFLICT, message=str(e))
 
 
-@blp.route("/<string:product_id>")
+@blp.route("/<string:id>")
 class ProductByIdViews(MethodView):
 
     @blp.response(schema=ProductModelSchema, status_code=HTTPStatus.OK)
@@ -111,18 +111,15 @@ class ProductByIdViews(MethodView):
         ),
     )
     @jwt_required()
-    def get(self, product_id: str):
+    def get(self, id: str):
         """as a user i can get my product by its id"""
-        productModel: ProductModel = ProductModel.get_by_id(model_id=product_id)
+        productModel: ProductModel = ProductModel.get_by_id(model_id=id)
         if bool(productModel) == False or (
-            productModel.delete_model == True
-            or productModel.user_id != getCurrentAuthId()
+            productModel.is_delete == True or productModel.user_id != getCurrentAuthId()
         ):
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,
-                message=MessageService.get_message("product_not_found").format(
-                    product_id
-                ),
+                message=MessageService.get_message("product_not_found").format(id),
             )
 
         return productModel
@@ -136,19 +133,19 @@ class ProductByIdViews(MethodView):
             "on url string"
         ),
     )
-    def put(self, product_data: ProductUpdateData, product_id: str):
+    def put(self, product_data: ProductUpdateData, id: str):
         """As a user,i can update my product by its id"""
-        productModel: ProductModel = ProductModel.get_by_id(model_id=product_id)
+        productModel: ProductModel = ProductModel.get_by_id(model_id=id)
         if productModel.user_id != getCurrentAuthId():
             abort(
                 http_status_code=HTTPStatus.NOT_ACCEPTABLE,
                 message=MessageService.get_message(
                     "user_id_on_product_not_match"
-                ).format(product_id),
+                ).format(id),
             )
         try:
             return ProductModel.update_with_update_data(
-                product_id=product_id, product_data=product_data
+                product_id=id, product_data=product_data
             )
         except Exception as e:
             abort(http_status_code=HTTPStatus.INTERNAL_SERVER_ERROR, message=str(e))
@@ -160,30 +157,26 @@ class ProductByIdViews(MethodView):
             "pass ont url"
         ),
     )
-    def delete(self, product_id: str):
+    def delete(self, id: str):
         """As a user, i can delete my product by its id"""
         try:
-            deleteModel: ProductModel = ProductModel.delete_model_by_id(
-                model_id=product_id
-            )
+            deleteModel: ProductModel = ProductModel.delete_model_by_id(model_id=id)
             if bool(deleteModel) == False:
                 abort(
                     http_status_code=HTTPStatus.NOT_FOUND,
-                    message=MessageService.get_message("product_not_found").format(
-                        product_id
-                    ),
+                    message=MessageService.get_message("product_not_found").format(id),
                 )
-            return {"message": f"product with id '{product_id}' success full delete"}
+            return {"message": f"product with id '{id}' success full delete"}
         except Exception as e:
             print(str(e))
             abort(
                 http_status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                message=f"failed to delete product with id '{product_id}' ",
+                message=f"failed to delete product with id '{id}' ",
             )
 
 
-@blp.route("/image/<string:product_id>")
-class ImageUserViews(MethodView):
+@blp.route("/image/<string:id>")
+class ImageProductViews(MethodView):
 
     @jwt_required()
     @blp.arguments(schema=ImageSchema, location="files")
@@ -192,7 +185,7 @@ class ImageUserViews(MethodView):
         status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
         description=MessageService.get_message("file_not_image_type"),
     )
-    def post(self, data: ImagesPayloadData, product_id: str):
+    def post(self, data: ImagesPayloadData, id: str):
         """As a user, i can post image to my product"""
         image_data: Upload = data.image
         if ImageService.check_extension(image_data=image_data) != True:
@@ -205,7 +198,7 @@ class ImageUserViews(MethodView):
             userImageModel = ProductImageModel.add_model(
                 public_id=response_data.public_id,
                 secure_url=response_data.secure_url,
-                product_id=product_id,
+                product_id=id,
             )
             return userImageModel
         except Exception as e:
@@ -220,15 +213,13 @@ class ImageUserViews(MethodView):
             "from jwt token"
         ),
     )
-    def get(self, product_id: str):
+    def get(self, id: str):
         """As a user, i can get image by its id"""
-        userModel: ProductModel = ProductModel.get_by_id(model_id=product_id)
+        userModel: ProductModel = ProductModel.get_by_id(model_id=id)
         if bool(userModel) == False:
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
-                message=MessageService.get_message("product_not_found").format(
-                    product_id
-                ),
+                message=MessageService.get_message("product_not_found").format(id),
             )
         return userModel
 

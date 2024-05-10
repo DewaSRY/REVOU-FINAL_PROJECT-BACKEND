@@ -84,7 +84,7 @@ class BusinessViews(MethodView):
             )
 
 
-@blp.route("/<string:business_id>")
+@blp.route("/<string:id>")
 class BusinessByIdViews(MethodView):
 
     @jwt_required()
@@ -95,9 +95,9 @@ class BusinessByIdViews(MethodView):
             "pass on url"
         ),
     )
-    def get(self, business_id: str):
+    def get(self, id: str):
         """As a user i can get business detail by it's id"""
-        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
+        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=id)
         if (
             bool(businessModel) == False
             or businessModel.is_delete == True
@@ -105,9 +105,7 @@ class BusinessByIdViews(MethodView):
         ):
             abort(
                 http_status_code=HTTPStatus.NOT_FOUND,
-                message=MessageService.get_message("business_not_found").format(
-                    business_id
-                ),
+                message=MessageService.get_message("business_not_found").format(id),
             )
         return businessModel
 
@@ -126,26 +124,24 @@ class BusinessByIdViews(MethodView):
             "on url, it might be because user id on business not match with auth user id"
         ),
     )
-    def put(self, business_data: BusinessCreateData, business_id: str):
+    def put(self, business_data: BusinessCreateData, id: str):
         """As a user i can update my own business data"""
-        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
+        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=id)
         if businessModel.user_id != getCurrentAuthId():
             abort(
                 http_status_code=HTTPStatus.FORBIDDEN,
                 message=MessageService.get_message("failed_to_delete_business").format(
-                    f"{business_id}, business user id not match with auth user id"
+                    f"{id}, business user id not match with auth user id"
                 ),
             )
         try:
-            return BusinessModel.update_by_id(
-                business_id=business_id, update_data=business_data
-            )
+            return BusinessModel.update_by_id(business_id=id, update_data=business_data)
         except Exception as e:
             print(e)
             abort(
                 http_status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 message=MessageService.get_message("failed_to_update_business").format(
-                    business_id
+                    id
                 ),
             )
 
@@ -162,31 +158,30 @@ class BusinessByIdViews(MethodView):
             "on url, it might be because user id on business not match with auth user id"
         ),
     )
-    def delete(self, business_id: str):
+    def delete(self, id: str):
         """As a user i, can delete my own business"""
-        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
+        businessModel: BusinessModel = BusinessModel.get_by_id(model_id=id)
         if businessModel.user_id != getCurrentAuthId():
             abort(
                 http_status_code=HTTPStatus.FORBIDDEN,
                 message=MessageService.get_message("failed_to_delete_business").format(
-                    f"{business_id}, business user id not match with auth user id"
+                    f"{id}, business user id not match with auth user id"
                 ),
             )
         try:
-            BusinessModel.delete_by_id(model_id=business_id)
-            return {"message": f"business with id {business_id} success fully delete"}
+            BusinessModel.delete_by_id(model_id=id)
+            return {"message": f"business with id {id} success fully delete"}
         except Exception as e:
             abort(
                 http_status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 message=MessageService.get_message("failed_to_delete_business").format(
-                    business_id
+                    id
                 ),
             )
 
 
-# TODO: handle product  image
-@blp.route("/image/<string:business_id>")
-class ImageUserViews(MethodView):
+@blp.route("/image/<string:id>")
+class ImageBusinessViews(MethodView):
 
     @jwt_required()
     @blp.arguments(schema=ImageSchema, location="files")
@@ -195,7 +190,7 @@ class ImageUserViews(MethodView):
         status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
         description=MessageService.get_message("file_not_image_type"),
     )
-    def post(self, data: ImagesPayloadData, business_id: str):
+    def post(self, data: ImagesPayloadData, id: str):
         """As a user, i can post business image"""
         image_data: Upload = data.image
         if ImageService.check_extension(image_data=image_data) != True:
@@ -208,7 +203,7 @@ class ImageUserViews(MethodView):
             userImageModel = BusinessImageModel.add_model(
                 public_id=response_data.public_id,
                 secure_url=response_data.secure_url,
-                business_id=business_id,
+                business_id=id,
             )
             return userImageModel
         except Exception as e:
@@ -223,15 +218,13 @@ class ImageUserViews(MethodView):
             "from jwt token"
         ),
     )
-    def get(self, business_id: str):
+    def get(self, id: str):
         """As a user, i can see all of my image"""
-        userModel: BusinessModel = BusinessModel.get_by_id(model_id=business_id)
+        userModel: BusinessModel = BusinessModel.get_by_id(model_id=id)
         if bool(userModel) == False:
             abort(
                 http_status_code=HTTPStatus.CONFLICT,
-                message=MessageService.get_message("product_not_found").format(
-                    business_id
-                ),
+                message=MessageService.get_message("product_not_found").format(id),
             )
         return userModel
 

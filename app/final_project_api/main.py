@@ -12,7 +12,8 @@ from flask_smorest import Api, Blueprint
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS, cross_origin
-
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 
 from .user_module.views import blp as UserBluePrint
 from .product_module.views import blp as ProductBluePrint
@@ -36,6 +37,7 @@ def create_app():
     migrate = Migrate(app, db)
     api = Api(app)
     cors = CORS(app)
+    ma = Marshmallow(app)
 
     @jwt.additional_claims_loader
     def add_claims_to_jwt(jwt_data: JWTData):

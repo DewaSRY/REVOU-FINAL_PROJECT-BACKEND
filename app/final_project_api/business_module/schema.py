@@ -2,6 +2,9 @@
 """
 
 from marshmallow import Schema, fields, post_load
+
+from flask_marshmallow.fields import Hyperlinks, URLFor
+
 from app.final_project_api.product_module.schema import ProductSchema
 
 from app.image_upload_service import ImageModelSchema
@@ -53,8 +56,27 @@ class BusinessPublicSchema(BusinessSchemas):
 
 
 class BusinessModelSchema(BusinessPublicSchema):
+    """ """
+
     product = fields.List(fields.Nested(ProductSchema), dump_only=True)
     business_images = fields.List(fields.Nested(ImageModelSchema))
+
+    _links = Hyperlinks(
+        {
+            "self": {
+                "href": URLFor("business.BusinessByIdViews", values=dict(id="<id>")),
+                "message": "use for get detail, update or delete ",
+            },
+            "collection": {
+                "href": URLFor("business.BusinessViews"),
+                "message": "use for get detail or crete ",
+            },
+            "image": {
+                "href": URLFor("business.ImageBusinessViews", values=dict(id="<id>")),
+                "message": "use for post image and see detail image ",
+            },
+        }
+    )
 
 
 class BusinessWithImageModel(Schema):
