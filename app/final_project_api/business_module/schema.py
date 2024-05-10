@@ -11,6 +11,7 @@ from .data import BusinessCreateData
 
 class BusinessImageModelSchema(ImageModelSchema):
     business_name = fields.Str()
+    business_id = fields.Str()
 
 
 class BusinessSchemas(Schema):

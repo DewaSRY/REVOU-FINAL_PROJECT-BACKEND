@@ -11,6 +11,7 @@ from app.image_upload_service import ImageModelSchema
 
 class UserImageModelSchema(ImageModelSchema):
     username = fields.String()
+    user_id = fields.Str()
 
 
 class UserWithImagesSchema(Schema):

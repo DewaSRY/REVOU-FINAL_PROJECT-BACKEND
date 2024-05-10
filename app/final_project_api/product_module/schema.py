@@ -9,6 +9,7 @@ from app.util.query_data import QuerySchema
 
 class ProductImageModelSchema(ImageModelSchema):
     product_name = fields.Str()
+    product_id = fields.Str()
 
 
 class ProductSchema(Schema):

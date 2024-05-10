@@ -38,5 +38,5 @@ class ImageModelSchema(Schema):
     id = fields.Str()
     public_id = fields.Str()
     secure_url = fields.Str()
-    user_id = fields.Str()
+    #
     create_at = fields.DateTime()
