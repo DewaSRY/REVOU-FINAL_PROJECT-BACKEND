@@ -20,6 +20,7 @@ flask-cors = "^4.0.0"
 cloudinary = "^1.40.0"
 waitress = "^3.0.0"
 flask-marshmallow = "^1.2.1"
+marshmallow-sqlalchemy = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
