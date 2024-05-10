@@ -2,8 +2,6 @@
 
 from app.database_connector import getSqliteConnector
 
-CACHE_TYPE = "SimpleCache"  # Flask-Caching related configs
-CACHE_DEFAULT_TIMEOUT = 300
 
 API_TITLE = "Final Project Api"
 API_VERSION = "v0"
