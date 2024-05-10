@@ -49,6 +49,7 @@ class BusinessViews(MethodView):
     @blp.response(schema=BusinessPublicListSchema, status_code=HTTPStatus.OK)
     def get(self, query_data: QueryData):
         """As a user, i can get all business public data without auth"""
+
         return PublicBusiness(
             queryData=query_data,
             businessList=BusinessModel.get_all_public(query_data=query_data),
@@ -95,6 +96,7 @@ class BusinessByIdViews(MethodView):
             "pass on url"
         ),
     )
+    @cache.cached(timeout=50)
     def get(self, id: str):
         """As a user i can get business detail by it's id"""
         businessModel: BusinessModel = BusinessModel.get_by_id(model_id=id)
